@@ -307,10 +307,17 @@ export default function AuthModal({ isOpen, onClose, mode, onModeChange }: AuthM
   }
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div 
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose()
+        }
+      }}
+    >
       <div className="w-full max-w-md">
         <Card className="border-0 shadow-2xl bg-gradient-to-br from-white via-red-50 to-green-50 dark:from-gray-900 dark:via-red-900/20 dark:to-green-900/20">
-          <CardHeader className="relative pb-6">
+          <CardHeader className={`relative ${mode === "register" ? "pb-4" : "pb-6"}`}>
             <Button
               variant="ghost"
               size="sm"
@@ -320,9 +327,9 @@ export default function AuthModal({ isOpen, onClose, mode, onModeChange }: AuthM
               <X className="h-4 w-4 text-red-600" />
             </Button>
             
-            <div className="text-center space-y-3">
+            <div className={`text-center ${mode === "register" ? "space-y-2" : "space-y-3"}`}>
               {/* Logo avec thème marocain */}
-              <div className="flex justify-center mb-4">
+              <div className={`flex justify-center ${mode === "register" ? "mb-3" : "mb-4"}`}>
                 <div className="relative">
                   <div className="w-20 h-20 bg-gradient-to-br from-red-600 via-red-500 to-green-600 rounded-full flex items-center justify-center shadow-lg">
                     <Trophy className="h-10 w-10 text-white" />
@@ -354,7 +361,7 @@ export default function AuthModal({ isOpen, onClose, mode, onModeChange }: AuthM
             </div>
           </CardHeader>
 
-          <CardContent className="space-y-6">
+          <CardContent className={`${mode === "register" ? "space-y-3" : "space-y-6"}`}>
             {/* Messages d'erreur/succès */}
             {error && (
               <div className="flex items-center space-x-2 p-3 text-sm border border-red-200 bg-red-50 text-red-800 rounded-lg">
@@ -412,7 +419,7 @@ export default function AuthModal({ isOpen, onClose, mode, onModeChange }: AuthM
               </button>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-4 mt-6">
+            <form onSubmit={handleSubmit} className={`${mode === "register" ? "space-y-3 mt-3" : "space-y-4 mt-6"}`}>
               {/* Mode Connexion */}
               {mode === "login" && (
                 <div className="space-y-4">
@@ -494,8 +501,8 @@ export default function AuthModal({ isOpen, onClose, mode, onModeChange }: AuthM
 
               {/* Mode Inscription */}
               {mode === "register" && (
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="register-first-name" className="flex items-center space-x-2 text-gray-700 dark:text-gray-300">
                         <User className="h-4 w-4 text-green-600" />

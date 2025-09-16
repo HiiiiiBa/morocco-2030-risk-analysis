@@ -150,27 +150,7 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Navigation par villes */}
-            <nav className="hidden lg:flex items-center space-x-1">
-              <Link href="/dashboard/morocco">
-                <Button
-                  variant="ghost"
-                  className="text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400"
-                >
-                  Maroc Global
-                </Button>
-              </Link>
-              {dashboardCities.map((city) => (
-                <Link key={city.slug} href={`/dashboard/city/${city.slug}`}>
-                  <Button
-                    variant="ghost"
-                    className="text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400"
-                  >
-                    {city.name}
-                  </Button>
-                </Link>
-              ))}
-            </nav>
+          
 
             {/* Actions utilisateur */}
             <div className="flex items-center space-x-4">
@@ -205,13 +185,6 @@ export default function DashboardPage() {
 
       {/* Contenu principal */}
       <div className="container mx-auto px-4 py-8">
-        {/* Vue d'ensemble */}
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Tableau de Bord Morocco 2030</h2>
-          <p className="text-gray-600 dark:text-gray-400">
-            Sélectionnez une ville pour accéder aux analyses détaillées et fonctionnalités spécialisées
-          </p>
-        </div>
 
         {/* Statistiques globales */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
@@ -331,29 +304,6 @@ export default function DashboardPage() {
               </div>
             </CardContent>
           </Card>
-        </div>
-
-        {/* Carte interactive du Maroc */}
-        <div className="mt-8">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <MapPin className="h-5 w-5 text-red-600" />
-                Carte Interactive du Maroc
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <MoroccoMap />
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="mt-8">
-          <CommentSection
-            title="Commentaires sur Morocco 2030"
-            placeholder="Partagez vos suggestions, retours d'expérience ou questions sur la plateforme..."
-            context="dashboard"
-          />
         </div>
       </div>
 

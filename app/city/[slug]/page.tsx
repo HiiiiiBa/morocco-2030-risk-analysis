@@ -121,7 +121,7 @@ const citiesData: Record<string, CityData> = {
       accessibleParking: "2,000 places"
     },
     images: [
-      "/image/rabat1.png",
+      "/image/rabat.png",
       "/image/rabat2.png",
       "/image/rabat3.png",
       "/image/rabat4.png",
