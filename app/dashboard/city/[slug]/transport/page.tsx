@@ -524,6 +524,310 @@ export default function TransportPage() {
           </CardContent>
         </Card>
 
+        {/* Cartes interactives pour Rabat */}
+        {city.slug === "rabat" && (
+          <div className="mb-8">
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Cartes Interactives - {city.name}</h3>
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Carte Tramway */}
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Train className="h-5 w-5 text-blue-600" />
+                    Plan du Tramway
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Consultez le plan détaillé des lignes de tramway de Rabat avec toutes les stations et itinéraires.
+                    </p>
+                    <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-blue-800 dark:text-blue-200">Ligne unique</span>
+                        <Badge variant="outline" className="text-blue-600">23 stations</Badge>
+                      </div>
+                      <div className="text-sm text-blue-700 dark:text-blue-300">
+                        <p>• Horaires : 5h30 - 23h30</p>
+                        <p>• Fréquence : 3-8 minutes</p>
+                        <p>• Prix : 6 MAD</p>
+                      </div>
+                    </div>
+                    
+                    {/* Image de la carte du tramway */}
+                    <div className="border rounded-lg overflow-hidden bg-gray-50 dark:bg-gray-800 group relative">
+                      <img
+                        src="/images/TramRabat.jpg"
+                        alt="Plan du tramway de Rabat"
+                        className="w-full h-auto max-h-96 object-contain transition-transform duration-300 group-hover:scale-105"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300 flex items-center justify-center">
+                        <button
+                          onClick={() => window.open('/images/TramRabat.jpg', '_blank')}
+                          className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white dark:bg-gray-800 px-3 py-1 rounded-full text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                        >
+                          Cliquer pour agrandir
+                        </button>
+                      </div>
+                    </div>
+                    
+                    <a
+                      href="https://www.tram-way.ma/fr/plan-des-lignes/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 text-sm"
+                    >
+                      <Navigation className="h-4 w-4" />
+                      Ouvrir dans un nouvel onglet
+                    </a>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Carte Bus */}
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Bus className="h-5 w-5 text-green-600" />
+                    Plan des Bus
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Découvrez les lignes de bus Al Bidaoui et trouvez les arrêts près de chez vous.
+                    </p>
+                    <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-green-800 dark:text-green-200">Réseau Al Bidaoui</span>
+                        <Badge variant="outline" className="text-green-600">20+ lignes</Badge>
+                      </div>
+                      <div className="text-sm text-green-700 dark:text-green-300">
+                        <p>• Horaires : 5h30 - 23h30</p>
+                        <p>• Fréquence : 5-10 minutes</p>
+                        <p>• Prix : 3-5 MAD</p>
+                      </div>
+                    </div>
+                    
+                    {/* Image de la carte des bus */}
+                    <div className="border rounded-lg overflow-hidden bg-gray-50 dark:bg-gray-800 group relative">
+                      <img
+                        src="/images/BusRabat.jpg"
+                        alt="Carte du réseau d'autobus Rabat-Salé-Temara"
+                        className="w-full h-auto max-h-96 object-contain transition-transform duration-300 group-hover:scale-105"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300 flex items-center justify-center">
+                        <button
+                          onClick={() => window.open('/images/BusRabat.jpg', '_blank')}
+                          className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white dark:bg-gray-800 px-3 py-1 rounded-full text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                        >
+                          Cliquer pour agrandir
+                        </button>
+                      </div>
+                    </div>
+                    
+                    <a
+                      href="https://www.alsacitybusrst.ma/fr/a-cote-de-moi"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 text-sm"
+                    >
+                      <MapPin className="h-4 w-4" />
+                      Ouvrir dans un nouvel onglet
+                    </a>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        )}
+
+        {/* Cartes interactives pour Casablanca */}
+        {city.slug === "casablanca" && (
+          <div className="mb-8">
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Cartes Interactives - {city.name}</h3>
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Carte Tramway */}
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Train className="h-5 w-5 text-blue-600" />
+                    Plan du Tramway
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Consultez le plan détaillé des lignes de tramway de Casablanca avec toutes les stations et itinéraires.
+                    </p>
+                    <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-blue-800 dark:text-blue-200">Lignes T1, T2</span>
+                        <Badge variant="outline" className="text-blue-600">En service</Badge>
+                      </div>
+                      <div className="text-sm text-blue-700 dark:text-blue-300">
+                        <p>• Horaires : 5h30 - 23h30</p>
+                        <p>• Fréquence : 3-8 minutes</p>
+                        <p>• Prix : 6 MAD</p>
+                      </div>
+                    </div>
+                    
+                    {/* Image de la carte du tramway */}
+                    <div className="border rounded-lg overflow-hidden bg-gray-50 dark:bg-gray-800 group relative">
+                      <img
+                        src="/images/TramCasa.jpg"
+                        alt="Plan du tramway de Casablanca"
+                        className="w-full h-auto max-h-96 object-contain transition-transform duration-300 group-hover:scale-105"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300 flex items-center justify-center">
+                        <button
+                          onClick={() => window.open('/images/TramCasa.jpg', '_blank')}
+                          className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white dark:bg-gray-800 px-3 py-1 rounded-full text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                        >
+                          Cliquer pour agrandir
+                        </button>
+                      </div>
+                    </div>
+                    
+                    <a
+                      href="https://www.casatramway.ma/nos-lignes/carte-reseau"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 text-sm"
+                    >
+                      <Navigation className="h-4 w-4" />
+                      Ouvrir dans un nouvel onglet
+                    </a>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Carte Bus */}
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Bus className="h-5 w-5 text-green-600" />
+                    Plan des Bus
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Découvrez le réseau de bus de Casablanca et trouvez les arrêts près de chez vous.
+                    </p>
+                    <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-green-800 dark:text-green-200">Casa Bus</span>
+                        <Badge variant="outline" className="text-green-600">Réseau étendu</Badge>
+                      </div>
+                      <div className="text-sm text-green-700 dark:text-green-300">
+                        <p>• Horaires : 6h00 - 23h00</p>
+                        <p>• Fréquence : 5-10 minutes</p>
+                        <p>• Prix : 3-8 MAD</p>
+                      </div>
+                    </div>
+                    
+                    {/* Image de la carte des bus */}
+                    <div className="border rounded-lg overflow-hidden bg-gray-50 dark:bg-gray-800 group relative">
+                      <img
+                        src="/images/BusCasa.jpg"
+                        alt="Carte du réseau de bus de Casablanca"
+                        className="w-full h-auto max-h-96 object-contain transition-transform duration-300 group-hover:scale-105"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300 flex items-center justify-center">
+                        <button
+                          onClick={() => window.open('/images/BusCasa.jpg', '_blank')}
+                          className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white dark:bg-gray-800 px-3 py-1 rounded-full text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                        >
+                          Cliquer pour agrandir
+                        </button>
+                      </div>
+                    </div>
+                    
+                    <a
+                      href="https://www.casabus.ma/en/roulez-avec-nous/plan-du-reseau/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 text-sm"
+                    >
+                      <MapPin className="h-4 w-4" />
+                      Ouvrir dans un nouvel onglet
+                    </a>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        )}
+
+        {/* Cartes interactives pour Agadir */}
+        {city.slug === "agadir" && (
+          <div className="mb-8">
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Cartes Interactives - {city.name}</h3>
+            <div className="grid md:grid-cols-1 gap-6">
+              {/* Carte Bus */}
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Bus className="h-5 w-5 text-green-600" />
+                    Plan du Réseau de Bus
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Découvrez le réseau de bus ALSA d'Agadir et trouvez les arrêts près de chez vous.
+                    </p>
+                    <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-green-800 dark:text-green-200">ALSA Agadir</span>
+                        <Badge variant="outline" className="text-green-600">40+ lignes</Badge>
+                      </div>
+                      <div className="text-sm text-green-700 dark:text-green-300">
+                        <p>• Lignes urbaines : 30 lignes</p>
+                        <p>• Lignes périurbaines : 10 lignes</p>
+                        <p>• Correspondances : 4 points principaux</p>
+                      </div>
+                    </div>
+                    
+                    {/* Image de la carte des bus */}
+                    <div className="border rounded-lg overflow-hidden bg-gray-50 dark:bg-gray-800 group relative">
+                      <img
+                        src="/images/BusAgadir.jpg"
+                        alt="Plan du réseau de bus du Grand Agadir"
+                        className="w-full h-auto max-h-96 object-contain transition-transform duration-300 group-hover:scale-105"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300 flex items-center justify-center">
+                        <button
+                          onClick={() => window.open('/images/BusAgadir.jpg', '_blank')}
+                          className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white dark:bg-gray-800 px-3 py-1 rounded-full text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                        >
+                          Cliquer pour agrandir
+                        </button>
+                      </div>
+                    </div>
+                    
+                    <a
+                      href="https://www.alsa.ma/en/agadir/lines"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 text-sm"
+                    >
+                      <MapPin className="h-4 w-4" />
+                      Ouvrir dans un nouvel onglet
+                    </a>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        )}
+
         {/* Informations pratiques */}
         <div className="grid md:grid-cols-2 gap-6">
           <Card>
