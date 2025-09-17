@@ -187,6 +187,8 @@ export default function MoroccoOverviewUnified() {
           </CardContent>
         </Card>
 
+        
+
         {/* Analyses globales */}
         <div className="grid md:grid-cols-3 gap-6 mb-8">
           <Card>
@@ -259,16 +261,8 @@ export default function MoroccoOverviewUnified() {
             </CardContent>
           </Card>
         </div>
-
-
-        <div className="mt-8">
-          <CommentSection
-            title="Commentaires sur l'analyse nationale"
-            placeholder="Partagez vos observations sur la coordination nationale, les analyses globales ou les recommandations pour Morocco 2030..."
-            context="morocco"
-          />
         </div>
-      </div>
+        |
 
       {/* Chatbot */}
       <Chatbot />

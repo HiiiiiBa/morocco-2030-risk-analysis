@@ -20,6 +20,7 @@ import {
 } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
 import Link from "next/link"
+import RabatMap from "@/components/rabat-map"
 
 interface City {
   name: string
@@ -205,250 +206,126 @@ export default function MapPage() {
           </p>
         </div>
 
-        {/* Carte simulée */}
+        {/* Carte Interactive */}
         <Card className="mb-8">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Navigation className="h-5 w-5 text-blue-600" />
-              Carte de {city.name}
+              Carte Interactive de {city.name}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="bg-gradient-to-br from-blue-100 via-yellow-50 to-orange-100 dark:from-blue-900 dark:via-yellow-900 dark:to-orange-900 rounded-lg h-96 flex items-center justify-center relative overflow-hidden">
-              {/* Carte SVG personnalisée pour chaque ville */}
-              <svg
-                viewBox="0 0 400 300"
-                className="w-full h-full"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                {/* Fond de la ville */}
-                <rect width="400" height="300" fill="#E5E7EB" className="opacity-30" />
+            {city.slug === "rabat" ? (
+              <RabatMap />
+            ) : (
+              <div className="bg-gradient-to-br from-blue-100 via-yellow-50 to-orange-100 dark:from-blue-900 dark:via-yellow-900 dark:to-orange-900 rounded-lg h-96 flex items-center justify-center relative overflow-hidden">
+                {/* Carte SVG personnalisée pour les autres villes */}
+                <svg
+                  viewBox="0 0 400 300"
+                  className="w-full h-full"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  {/* Fond de la ville */}
+                  <rect width="400" height="300" fill="#E5E7EB" className="opacity-30" />
+                  
+                  {/* Zones spécifiques à chaque ville */}
+                  {city.slug === "casablanca" && (
+                    <>
+                      <circle cx="100" cy="80" r="25" fill="#10B981" opacity="0.3" />
+                      <text x="100" y="85" textAnchor="middle" className="text-xs fill-green-800">Centre</text>
+                      <circle cx="300" cy="120" r="20" fill="#F59E0B" opacity="0.3" />
+                      <text x="300" y="125" textAnchor="middle" className="text-xs fill-yellow-800">Corniche</text>
+                      <circle cx="200" cy="200" r="30" fill="#EF4444" opacity="0.3" />
+                      <text x="200" y="205" textAnchor="middle" className="text-xs fill-red-800">Médina</text>
+                    </>
+                  )}
+                  {city.slug === "fes" && (
+                    <>
+                      <circle cx="120" cy="100" r="35" fill="#F59E0B" opacity="0.3" />
+                      <text x="120" y="105" textAnchor="middle" className="text-xs fill-yellow-800">Médina</text>
+                      <circle cx="280" cy="150" r="25" fill="#10B981" opacity="0.3" />
+                      <text x="280" y="155" textAnchor="middle" className="text-xs fill-green-800">Nouvelle Ville</text>
+                      <circle cx="200" cy="200" r="20" fill="#F59E0B" opacity="0.3" />
+                      <text x="200" y="205" textAnchor="middle" className="text-xs fill-yellow-800">Tanneries</text>
+                    </>
+                  )}
+                  {city.slug === "agadir" && (
+                    <>
+                      <circle cx="100" cy="100" r="30" fill="#10B981" opacity="0.3" />
+                      <text x="100" y="105" textAnchor="middle" className="text-xs fill-green-800">Plage</text>
+                      <circle cx="300" cy="150" r="25" fill="#10B981" opacity="0.3" />
+                      <text x="300" y="155" textAnchor="middle" className="text-xs fill-green-800">Marina</text>
+                      <circle cx="200" cy="200" r="20" fill="#10B981" opacity="0.3" />
+                      <text x="200" y="205" textAnchor="middle" className="text-xs fill-green-800">Centre</text>
+                    </>
+                  )}
+                  {city.slug === "marrakech" && (
+                    <>
+                      <circle cx="100" cy="100" r="30" fill="#F59E0B" opacity="0.3" />
+                      <text x="100" y="105" textAnchor="middle" className="text-xs fill-yellow-800">Médina</text>
+                      <circle cx="300" cy="150" r="25" fill="#10B981" opacity="0.3" />
+                      <text x="300" y="155" textAnchor="middle" className="text-xs fill-green-800">Gueliz</text>
+                      <circle cx="200" cy="200" r="20" fill="#F59E0B" opacity="0.3" />
+                      <text x="200" y="205" textAnchor="middle" className="text-xs fill-yellow-800">Souks</text>
+                    </>
+                  )}
+                  {city.slug === "tanger" && (
+                    <>
+                      <circle cx="100" cy="100" r="25" fill="#F59E0B" opacity="0.3" />
+                      <text x="100" y="105" textAnchor="middle" className="text-xs fill-yellow-800">Médina</text>
+                      <circle cx="300" cy="150" r="30" fill="#10B981" opacity="0.3" />
+                      <text x="300" y="155" textAnchor="middle" className="text-xs fill-green-800">Centre</text>
+                      <circle cx="200" cy="200" r="20" fill="#F59E0B" opacity="0.3" />
+                      <text x="200" y="205" textAnchor="middle" className="text-xs fill-yellow-800">Port</text>
+                    </>
+                  )}
+                  
+                  {/* Stade principal */}
+                  <rect x="180" y="130" width="40" height="30" fill="#DC2626" rx="5" />
+                  <text x="200" y="150" textAnchor="middle" className="text-xs fill-white font-bold">Stade</text>
+                  
+                  {/* Points d'intérêt */}
+                  <circle cx="100" cy="100" r="5" fill="#3B82F6" />
+                  <circle cx="300" cy="150" r="5" fill="#8B5CF6" />
+                  <circle cx="200" cy="200" r="5" fill="#F59E0B" />
+                  
+                  {/* Légende */}
+                  <rect x="10" y="10" width="120" height="80" fill="white" fillOpacity="0.9" rx="5" />
+                  <text x="20" y="25" className="text-xs font-bold">Zones de {city.name}</text>
+                  <circle cx="20" cy="40" r="3" fill="#10B981" />
+                  <text x="30" y="45" className="text-xs">Zone sécurisée</text>
+                  <circle cx="20" cy="55" r="3" fill="#F59E0B" />
+                  <text x="30" y="60" className="text-xs">Zone de vigilance</text>
+                  <circle cx="20" cy="70" r="3" fill="#EF4444" />
+                  <text x="30" y="75" className="text-xs">Zone à risque</text>
+                </svg>
                 
-                {/* Zones spécifiques à chaque ville */}
-                {city.slug === "casablanca" && (
-                  <>
-                    <circle cx="100" cy="80" r="25" fill="#10B981" opacity="0.3" />
-                    <text x="100" y="85" textAnchor="middle" className="text-xs fill-green-800">Centre</text>
-                    <circle cx="300" cy="120" r="20" fill="#F59E0B" opacity="0.3" />
-                    <text x="300" y="125" textAnchor="middle" className="text-xs fill-yellow-800">Corniche</text>
-                    <circle cx="200" cy="200" r="30" fill="#EF4444" opacity="0.3" />
-                    <text x="200" y="205" textAnchor="middle" className="text-xs fill-red-800">Médina</text>
-                  </>
-                )}
-                {city.slug === "rabat" && (
-                  <>
-                    <circle cx="150" cy="100" r="30" fill="#10B981" opacity="0.3" />
-                    <text x="150" y="105" textAnchor="middle" className="text-xs fill-green-800">Kasbah</text>
-                    <circle cx="250" cy="150" r="25" fill="#10B981" opacity="0.3" />
-                    <text x="250" y="155" textAnchor="middle" className="text-xs fill-green-800">Centre</text>
-                    <circle cx="200" cy="220" r="20" fill="#F59E0B" opacity="0.3" />
-                    <text x="200" y="225" textAnchor="middle" className="text-xs fill-yellow-800">Agdal</text>
-                  </>
-                )}
-                {city.slug === "fes" && (
-                  <>
-                    <circle cx="120" cy="100" r="35" fill="#F59E0B" opacity="0.3" />
-                    <text x="120" y="105" textAnchor="middle" className="text-xs fill-yellow-800">Médina</text>
-                    <circle cx="280" cy="150" r="25" fill="#10B981" opacity="0.3" />
-                    <text x="280" y="155" textAnchor="middle" className="text-xs fill-green-800">Nouvelle Ville</text>
-                    <circle cx="200" cy="200" r="20" fill="#F59E0B" opacity="0.3" />
-                    <text x="200" y="205" textAnchor="middle" className="text-xs fill-yellow-800">Tanneries</text>
-                  </>
-                )}
-                {city.slug === "agadir" && (
-                  <>
-                    <circle cx="100" cy="100" r="30" fill="#10B981" opacity="0.3" />
-                    <text x="100" y="105" textAnchor="middle" className="text-xs fill-green-800">Plage</text>
-                    <circle cx="300" cy="150" r="25" fill="#10B981" opacity="0.3" />
-                    <text x="300" y="155" textAnchor="middle" className="text-xs fill-green-800">Marina</text>
-                    <circle cx="200" cy="200" r="20" fill="#10B981" opacity="0.3" />
-                    <text x="200" y="205" textAnchor="middle" className="text-xs fill-green-800">Centre</text>
-                  </>
-                )}
-                {city.slug === "marrakech" && (
-                  <>
-                    <circle cx="100" cy="100" r="30" fill="#F59E0B" opacity="0.3" />
-                    <text x="100" y="105" textAnchor="middle" className="text-xs fill-yellow-800">Médina</text>
-                    <circle cx="300" cy="150" r="25" fill="#10B981" opacity="0.3" />
-                    <text x="300" y="155" textAnchor="middle" className="text-xs fill-green-800">Gueliz</text>
-                    <circle cx="200" cy="200" r="20" fill="#F59E0B" opacity="0.3" />
-                    <text x="200" y="205" textAnchor="middle" className="text-xs fill-yellow-800">Souks</text>
-                  </>
-                )}
-                {city.slug === "tanger" && (
-                  <>
-                    <circle cx="100" cy="100" r="25" fill="#F59E0B" opacity="0.3" />
-                    <text x="100" y="105" textAnchor="middle" className="text-xs fill-yellow-800">Médina</text>
-                    <circle cx="300" cy="150" r="30" fill="#10B981" opacity="0.3" />
-                    <text x="300" y="155" textAnchor="middle" className="text-xs fill-green-800">Centre</text>
-                    <circle cx="200" cy="200" r="20" fill="#F59E0B" opacity="0.3" />
-                    <text x="200" y="205" textAnchor="middle" className="text-xs fill-yellow-800">Port</text>
-                  </>
-                )}
-                
-                {/* Stade principal */}
-                <rect x="180" y="130" width="40" height="30" fill="#DC2626" rx="5" />
-                <text x="200" y="150" textAnchor="middle" className="text-xs fill-white font-bold">Stade</text>
-                
-                {/* Points d'intérêt */}
-                <circle cx="100" cy="100" r="5" fill="#3B82F6" />
-                <circle cx="300" cy="150" r="5" fill="#8B5CF6" />
-                <circle cx="200" cy="200" r="5" fill="#F59E0B" />
-                
-                {/* Légende */}
-                <rect x="10" y="10" width="120" height="80" fill="white" fillOpacity="0.9" rx="5" />
-                <text x="20" y="25" className="text-xs font-bold">Zones de {city.name}</text>
-                <circle cx="20" cy="40" r="3" fill="#10B981" />
-                <text x="30" y="45" className="text-xs">Zone sécurisée</text>
-                <circle cx="20" cy="55" r="3" fill="#F59E0B" />
-                <text x="30" y="60" className="text-xs">Zone de vigilance</text>
-                <circle cx="20" cy="70" r="3" fill="#EF4444" />
-                <text x="30" y="75" className="text-xs">Zone à risque</text>
-              </svg>
-              
-              {/* Informations spécifiques à la ville */}
-              <div className="absolute bottom-4 right-4 bg-white dark:bg-gray-800 rounded-lg p-3 shadow-lg">
-                <h4 className="font-semibold text-sm mb-2">Points d'Intérêt</h4>
-                <div className="space-y-1 text-xs">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-red-600 rounded"></div>
-                    <span>Stade {city.stadium}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-blue-600 rounded"></div>
-                    <span>Centre-ville</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-purple-600 rounded"></div>
-                    <span>Zone touristique</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-yellow-600 rounded"></div>
-                    <span>Transport public</span>
+                {/* Informations spécifiques à la ville */}
+                <div className="absolute bottom-4 right-4 bg-white dark:bg-gray-800 rounded-lg p-3 shadow-lg">
+                  <h4 className="font-semibold text-sm mb-2">Points d'Intérêt</h4>
+                  <div className="space-y-1 text-xs">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-red-600 rounded"></div>
+                      <span>Stade {city.stadium}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-blue-600 rounded"></div>
+                      <span>Centre-ville</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-purple-600 rounded"></div>
+                      <span>Zone touristique</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-yellow-600 rounded"></div>
+                      <span>Transport public</span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            )}
           </CardContent>
         </Card>
-
-        {/* Signalements récents */}
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5 text-orange-600" />
-                Signalements Récents
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-3">
-                <div className="flex items-start gap-3 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
-                  <AlertTriangle className="h-5 w-5 text-yellow-600 mt-0.5" />
-                  <div className="flex-1">
-                    <div className="flex justify-between items-start">
-                      <span className="font-medium text-sm">Trafic dense</span>
-                      <span className="text-xs text-gray-500">Il y a 15 min</span>
-                    </div>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                      Boulevard principal - Circulation ralentie
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                  <Shield className="h-5 w-5 text-green-600 mt-0.5" />
-                  <div className="flex-1">
-                    <div className="flex justify-between items-start">
-                      <span className="font-medium text-sm">Zone sécurisée</span>
-                      <span className="text-xs text-gray-500">Il y a 1h</span>
-                    </div>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                      Centre-ville - Patrouille de police visible
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                  <Users className="h-5 w-5 text-blue-600 mt-0.5" />
-                  <div className="flex-1">
-                    <div className="flex justify-between items-start">
-                      <span className="font-medium text-sm">Foule importante</span>
-                      <span className="text-xs text-gray-500">Il y a 2h</span>
-                    </div>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                      Place centrale - Rassemblement pacifique
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Camera className="h-5 w-5 text-purple-600" />
-                Signaler un Incident
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                Aidez la communauté en signalant des incidents ou des situations à surveiller.
-              </div>
-              
-              <div className="space-y-3">
-                <Button className="w-full justify-start" variant="outline">
-                  <AlertTriangle className="h-4 w-4 mr-2 text-red-600" />
-                  Incident de sécurité
-                </Button>
-                <Button className="w-full justify-start" variant="outline">
-                  <Navigation className="h-4 w-4 mr-2 text-yellow-600" />
-                  Problème de circulation
-                </Button>
-                <Button className="w-full justify-start" variant="outline">
-                  <Users className="h-4 w-4 mr-2 text-blue-600" />
-                  Rassemblement suspect
-                </Button>
-                <Button className="w-full justify-start" variant="outline">
-                  <Shield className="h-4 w-4 mr-2 text-green-600" />
-                  Zone sécurisée
-                </Button>
-              </div>
-
-              <div className="text-xs text-gray-500 mt-4">
-                * Vos signalements sont anonymes et contribuent à la sécurité de tous
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Statistiques de sécurité */}
-        <div className="grid md:grid-cols-3 gap-6">
-          <Card>
-            <CardContent className="p-6 text-center">
-              <div className="text-3xl font-bold text-green-600 mb-2">85%</div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">Zones Sûres</div>
-              <div className="text-xs text-gray-500 mt-1">Mise à jour il y a 5 min</div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6 text-center">
-              <div className="text-3xl font-bold text-yellow-600 mb-2">12%</div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">Zones de Vigilance</div>
-              <div className="text-xs text-gray-500 mt-1">Surveillance renforcée</div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6 text-center">
-              <div className="text-3xl font-bold text-red-600 mb-2">3%</div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">Zones à Risque</div>
-              <div className="text-xs text-gray-500 mt-1">Éviter si possible</div>
-            </CardContent>
-          </Card>
-        </div>
       </div>
     </div>
   )

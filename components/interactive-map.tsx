@@ -263,9 +263,28 @@ export default function InteractiveMap({ onCitySelect, className = "" }: Interac
 
         const customIcon = L.divIcon({
           className: "custom-marker",
-          html: `<div style="background-color: ${color}; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 10px;">${city.name.charAt(0)}</div>`,
-          iconSize: [24, 24],
-          iconAnchor: [12, 12],
+          html: `<div style="
+            background-color: ${color}; 
+            width: 24px; 
+            height: 24px; 
+            border-radius: 50%; 
+            border: 4px solid white; 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.2); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            position: relative;
+          ">
+            <div style="
+              width: 8px; 
+              height: 8px; 
+              background-color: white; 
+              border-radius: 50%; 
+              opacity: 0.9;
+            "></div>
+          </div>`,
+          iconSize: [32, 32],
+          iconAnchor: [16, 16],
         })
 
         const marker = L.marker([city.lat, city.lng], { icon: customIcon })

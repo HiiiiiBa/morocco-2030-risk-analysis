@@ -602,7 +602,7 @@ export default function CityTransportContent({ citySlug }: CityTransportContentP
                       <p>• Fréquence : 3-8 minutes</p>
                       <p>• Prix : 6 MAD</p>
                     </div>
-                  </div>
+            </div>
                   
                   {/* Image de la carte du tramway */}
                   <div className="border rounded-lg overflow-hidden bg-gray-50 dark:bg-gray-800 group relative">
@@ -619,8 +619,8 @@ export default function CityTransportContent({ citySlug }: CityTransportContentP
                       >
                         Cliquer pour agrandir
                       </button>
-                    </div>
-                  </div>
+            </div>
+          </div>
                   
                   <a
                     href="https://www.casatramway.ma/nos-lignes/carte-reseau"
@@ -658,7 +658,7 @@ export default function CityTransportContent({ citySlug }: CityTransportContentP
                       <p>• Fréquence : 5-10 minutes</p>
                       <p>• Prix : 3-8 MAD</p>
                     </div>
-                  </div>
+            </div>
                   
                   {/* Image de la carte des bus */}
                   <div className="border rounded-lg overflow-hidden bg-gray-50 dark:bg-gray-800 group relative">
@@ -675,8 +675,8 @@ export default function CityTransportContent({ citySlug }: CityTransportContentP
                       >
                         Cliquer pour agrandir
                       </button>
-                    </div>
-                  </div>
+            </div>
+          </div>
                   
                   <a
                     href="https://www.casabus.ma/en/roulez-avec-nous/plan-du-reseau/"
@@ -687,12 +687,12 @@ export default function CityTransportContent({ citySlug }: CityTransportContentP
                     <MapPin className="h-4 w-4" />
                     Ouvrir dans un nouvel onglet
                   </a>
-                </div>
+            </div>
               </CardContent>
             </Card>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
       {/* Cartes interactives pour Agadir */}
       {city.slug === "agadir" && (
@@ -722,7 +722,7 @@ export default function CityTransportContent({ citySlug }: CityTransportContentP
                       <p>• Lignes périurbaines : 10 lignes</p>
                       <p>• Correspondances : 4 points principaux</p>
                     </div>
-                  </div>
+            </div>
                   
                   {/* Image de la carte des bus */}
                   <div className="border rounded-lg overflow-hidden bg-gray-50 dark:bg-gray-800 group relative">
@@ -739,8 +739,8 @@ export default function CityTransportContent({ citySlug }: CityTransportContentP
                       >
                         Cliquer pour agrandir
                       </button>
-                    </div>
-                  </div>
+            </div>
+          </div>
                   
                   <a
                     href="https://www.alsa.ma/en/agadir/lines"
@@ -751,12 +751,12 @@ export default function CityTransportContent({ citySlug }: CityTransportContentP
                     <MapPin className="h-4 w-4" />
                     Ouvrir dans un nouvel onglet
                   </a>
-                </div>
+            </div>
               </CardContent>
             </Card>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
       {/* Informations pratiques */}
       <div className="grid md:grid-cols-2 gap-6">
