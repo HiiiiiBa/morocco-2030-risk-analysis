@@ -33,6 +33,9 @@ import WeatherWidget from "@/components/weather-widget"
 import Chatbot from "@/components/chatbot"
 import CityTransportContent from "@/components/city-transport-content"
 import CityInfoContent from "@/components/city-info-content"
+import CityFanExperienceContent from "@/components/city-fan-experience-content"
+import CityInfoDetailedContent from "@/components/city-info-detailed-content"
+import CityMapDetailedContent from "@/components/city-map-detailed-content"
 
 interface City {
   name: string
@@ -426,57 +429,15 @@ export default function CityPage() {
           </TabsContent>
 
           <TabsContent value="info" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Info className="h-5 w-5" />
-                  Informations détaillées - {city.name}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CityInfoContent citySlug={city.slug} cityName={city.name} />
-              </CardContent>
-            </Card>
+            <CityInfoDetailedContent city={city} />
           </TabsContent>
 
           <TabsContent value="map" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MapPin className="h-5 w-5" />
-                  Carte Interactive - {city.name}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-8">
-                  <MapPin className="h-16 w-16 text-red-600 mx-auto mb-4" />
-                  <h3 className="text-xl font-bold mb-2">Carte interactive</h3>
-                  <p className="text-gray-600 dark:text-gray-400">
-                    Visualisez les zones à risque et signalez des incidents en temps réel.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+            <CityMapDetailedContent city={city} />
           </TabsContent>
 
           <TabsContent value="fan-experience" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Heart className="h-5 w-5" />
-                  Fan Experience - {city.name}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-8">
-                  <Heart className="h-16 w-16 text-purple-600 mx-auto mb-4" />
-                  <h3 className="text-xl font-bold mb-2">Expérience des supporters</h3>
-                  <p className="text-gray-600 dark:text-gray-400">
-                    Découvrez les fan zones et événements organisés dans {city.name}.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+            <CityFanExperienceContent city={city} />
           </TabsContent>
         </Tabs>
 
@@ -485,7 +446,6 @@ export default function CityPage() {
             title={`Commentaires sur ${city.name}`}
             placeholder={`Partagez vos expériences, conseils ou observations sur ${city.name}...`}
             context="city"
-            cityName={city.name}
           />
         </div>
       </div>

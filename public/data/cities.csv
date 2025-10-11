@@ -1,0 +1,88 @@
+Ville,Indice_Criminalite,Indice_Pollution,Score_Infrastructures,NiveauGlobalRisque,lat,lng
+Rabat	30.12	55	4.5	Faible	34.021.845	-6.840.893
+Casablanca	61.94	55	4.8	Modéré	33.594.514	-7.620.028
+Tanger	55.11	59	3.8	Modéré	357.625.681	-58.295.062
+Agadir	39.12	75	3.4	Faible	304.205.162	-95.838.532
+Marrakech	54.45	57	2.5	Modéré	316.258.257	-79.891.608
+Fes	60.5	55	2	Modéré	340.346.534	-50.161.926
+Tetouan	22.09	60	3.6	Faible	35.570.175	-53.742.776
+Safi	34.71	68	3	Faible	32.299.424	-9.239.533
+Oujda	44.65	58	3	Modéré	34.677.874	-1.929.306
+Nador	39.23	58	2.9	Faible	351.739.922	-29.281.198
+Mohammedia	33.34	54	2.5	Faible	336.958.383	-73.893.292
+Meknes	50.45	54	3.2	Modéré	338.984.131	-55.321.582
+Larache	35	57	2.5	Faible	351.952.327	-6.152.913
+El Jadida	42.08	57	2.5	Faible	332.433.309	-849.884
+Kenitra	45.81	54	3.8	Faible	3.426.457	-6.570.169
+Settat	46.25	55	2.1	Modéré	33.002.397	-7.619.867
+Sidi Slimane	22.46	54	2.7	Faible	34.259.878	-5.927.253
+Al Hoceima	32.41	60	4	Faible	35.245.114	-3.930.186
+Berrechid	25	55	1.8	Faible	332.676.746	-75.811.465
+Guelmim	40	69	2.1	Modéré	289.863.852	-100.574.351
+Ouarzazate	24.53	65	3	Faible	30.920.193	-6.910.923
+Dakhla	30.2	129	2.5	Modéré	236.940.663	-159.431.274
+Laayoune 	32.43	65	3.7	Faible	27.154.512	-131.953.921
+Er Rachidia	23.4	67	2.4	Faible	31.929.089	-44.340.807
+Beni Mellal	40.4	56	2.5	Faible	32.334.193	-6.353.335
+Essaouira	19.4	68	2.1	Faible	315.118.281	-97.620.903
+Sale	61.03	55	4.1	Modéré	34.044.889	-6.814.017
+Taroudant	28.4	77	1.5	Faible	30.470.651	-8.877.922
+Ifrane	10.91	55	2.6	Faible	33.527.605	-5.107.408
+Chefchaouen	14.59	58	2.7	Faible	351.700.832	-52.766.583
+Merzouga	19.54	81	2.2	Faible	310.999.166	-40.140.878
+Khenifra	21.44	54	3.3	Faible	329.357.718	-56.696.504
+Tiznit	20.32	78	3.5	Faible	29.698.624	-97.312.815
+Ben Guerir	25.64	62	2.3	Faible	32.239.034	-7.958.131
+Inzegane	37.59	77	3	Modéré	335.563.151	-76.006.099
+Asilah	15.03	58	3.7	Faible	35.461.928	-6.036.545
+Azilal	20.48	57	1.5	Faible	31.959.295	-6.570.991
+Sidi Ifni	21.4	69	2	Faible	293.791.253	-101.715.632
+Tinghir	21.34	59	2.2	Faible	3.152.133	-5.531.164
+Khouribga	29.3	55	2.5	Faible	328.856.482	6.908.798
+Khemisset	33.21	54	2.3	Faible	33.830.287	-6.072.605
+Berkane	30.58	57	2	Faible	349.266.755	-23.294.087
+Fquih Ben Salah	30.39	55	1.5	Faible	324.212.148	-67.470.785
+Ksar El Kebir	35.4	56	2.1	Faible	34.999.218	-5.898.724
+Martil	23.49	61	3.1	Faible	35.617.441	-5.274.154
+Sidi Kacem	22.5	55	2.9	Faible	34.226.412	-5.711.434
+Taza	17.49	58	1.9	Faible	34.230.155	-4.010.104
+Azrou	18.45	55	1.8	Faible	33.436.117	-5.221.913
+Ait Melloul	35	57	2.3	Faible	303.387.947	-95.044.701
+Agdal-Riyad	15.84	55	4.0	Faible	33.9866	6.8514
+El Youssoufia	47.97	55	3.9	Modéré	33.9975	6.8147
+Hassan	15.84	50	4.6	Faible	34.0220	6.8380
+ Souissi	10.42	50	4.6	Faible	33.9799	6.8405
+ Yacoub El Mansour	42.98	55	4.1	Modéré	33.9834	6.8873
+Temara	44,34	60	3.9	Modéré	33.9213	6.8999
+Touarga	10.0	55	3.5	Faible	34.0032	6.8384
+Aïn Chock	40.67	55	4.5	Modéré	33.5397	7.5941
+Aïn Sebaâ	29.64	55	4.6	Faible	33.6005	7.5356
+Al Fida	15.97	55	4.2	Faible	33.5668	7.5870
+Anfa	14.34	55	4.3	Faible	33.5731	7.5898
+Ben M'sik	22.86	55	4.6	Faible	33.5568	7.5807
+Essoukhor Assawda	18.96	55	4.5	Faible	33.5930	7.5973
+Hay Hassani	30.97	55	4.5	Faible	33.5709	7.6779
+Hay Mohammedi	65.24	55	4.8	Élevé	33.5903	 7.5654
+Maârif	11.76	55	4.7	Faible	33.5657	 7.6372
+Mers Sultan	9.74	55	4.7	Faible	33.5763	 7.5995
+Moulay Rachid	90	80	4.5	Élevé	33.5652	7.5294
+Sbata	80	55	4.6	Élevé	33.5415	7.5662
+Sidi Belyout	45.35	55	4.2	Modéré	33.5968	7.6167
+Sidi Bernoussi	43.25	55	4.5	Modéré	33.6106	7.4974
+Sidi Moumen	42.75	55	4.5	Modéré	33.5814	7.5242
+Sidi Othman	32.74	55	4.7	Faible	33.5620	7.5721
+Agdal (Fès)	35.42	55	3.2	Faible	34.0382	4.9992
+El Mariniyine	40.44	55	3.0	Modéré	34.0649	5.0003
+Fès-Médina	30.49	55	3.2	Faible	34.0631	4.9769
+Jnan El Ouard	49.30	55	3.0	Modéré	34.0549	4.9540
+Saiss	25.40	55	3.4	Faible	33.9362	4.9715
+Zouagha	50.49	55	3.0	Modéré	34.0121	5.0375
+Bni Makada	50.34	55	3.5	Modéré	35.7503	5.8169
+Charf-Mghogha	29.49	55	3.5	Faible	35.7641	5.7972
+Charf-Souani	25.40	55	3.6	Faible	35.7647	5.8134
+Tanger-Médina	20.49	55	3.9	Faible	35.7535	5.8509
+Guéliz	10.63	57	2.8	Faible	31.6337	8.0089
+Ménara	14.85	57	3.5	Faible	31.6280	8.0584
+Marrakech-Médina	41.75	56	3.0	Modéré	31.6226	7.9899
+Ennakhil	23.86	56	2.7	Faible	31.6456	7.9804
+Sidi Youssef Ben Ali	76.46	60	2.0	Élevé	31.6033	7.9616

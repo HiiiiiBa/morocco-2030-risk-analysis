@@ -10,10 +10,15 @@ import Link from "next/link"
 import CommentSection from "@/components/comment-section"
 import Chatbot from "@/components/chatbot"
 import InteractiveMap from "@/components/interactive-map"
+import { CityData, NationalStats, parseCSV, calculateNationalStats, mapCSVToCityComparison } from "@/lib/csv-utils"
 
 export default function MoroccoOverviewUnified() {
   const [userData, setUserData] = useState<any>(null)
   const [selectedCityFromMap, setSelectedCityFromMap] = useState<any>(null)
+  const [cityComparison, setCityComparison] = useState<CityData[]>([])
+  const [nationalStats, setNationalStats] = useState<NationalStats | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     // Récupérer les données utilisateur depuis localStorage
@@ -21,7 +26,48 @@ export default function MoroccoOverviewUnified() {
     if (user) {
       setUserData(JSON.parse(user))
     }
+
+    // Charger les données CSV
+    loadCSVData()
   }, [])
+
+  const loadCSVData = async () => {
+    try {
+      setLoading(true)
+      setError(null)
+      
+      // Chemin vers votre fichier CSV - modifiez selon votre structure
+      const csvPath = '/data/cities.csv' 
+      
+      const response = await fetch(csvPath)
+      if (!response.ok) {
+        throw new Error(`Erreur lors du chargement du fichier CSV: ${response.statusText}`)
+      }
+      
+      const csvContent = await response.text()
+      const parsedData = parseCSV(csvContent)
+      const mappedData = mapCSVToCityComparison(parsedData)
+      const stats = calculateNationalStats(parsedData)
+      
+      setCityComparison(mappedData)
+      setNationalStats(stats)
+    } catch (err) {
+      console.error('Erreur lors du chargement des données CSV:', err)
+      setError(err instanceof Error ? err.message : 'Erreur inconnue')
+      
+
+      setNationalStats({
+        totalCapacity: 410000,
+        averageCriminalite: 30,
+        averagePollution: 38,
+        averageInfrastructure: 3.5,
+        totalMatches: 32,
+        expectedVisitors: 2500000,
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const handleLogout = () => {
     localStorage.removeItem("authToken")
@@ -29,23 +75,6 @@ export default function MoroccoOverviewUnified() {
     window.location.href = "/"
   }
 
-  const nationalStats = {
-    totalCapacity: 410000,
-    averageCriminalite: 30,
-    averagePollution: 38,
-    averageInfrastructure: 3.5,
-    totalMatches: 32,
-    expectedVisitors: 2500000,
-  }
-
-  const cityComparison = [
-    { name: "Casablanca", capacity: 115000, risk: "Moyen", criminalite: 45, pollution: 55 },
-    { name: "Tanger", capacity: 76000, risk: "Moyen", criminalite: 35, pollution: 40 },
-    { name: "Rabat", capacity: 68000, risk: "Faible", criminalite: 25, pollution: 35 },
-    { name: "Fès", capacity: 55000, risk: "Faible", criminalite: 20, pollution: 30 },
-    { name: "Agadir", capacity: 46000, risk: "Faible", criminalite: 15, pollution: 25 },
-    { name: "Marrakech", capacity: 45000, risk: "Moyen", criminalite: 40, pollution: 45 },
-  ]
 
   const handleCitySelect = (city: any) => {
     setSelectedCityFromMap(city)
@@ -112,6 +141,24 @@ export default function MoroccoOverviewUnified() {
           <p className="text-gray-600 dark:text-gray-400 max-w-2xl">
             Analyse globale de toutes les villes hôtes et coordination nationale pour la Coupe du Monde 2030
           </p>
+          
+          {/* Indicateur de chargement et d'erreur */}
+          {loading && (
+            <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+              <p className="text-blue-700 dark:text-blue-300">Chargement des données depuis le fichier CSV...</p>
+            </div>
+          )}
+          
+          {error && (
+            <div className="mt-4 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+              <p className="text-red-700 dark:text-red-300">
+                <strong>Erreur:</strong> {error}
+              </p>
+              <p className="text-sm text-red-600 dark:text-red-400 mt-1">
+                Utilisation des données par défaut. Vérifiez que votre fichier CSV est accessible.
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Statistiques nationales */}
@@ -124,31 +171,41 @@ export default function MoroccoOverviewUnified() {
           </Card>
           <Card>
             <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-green-600 mb-1">410K</div>
+              <div className="text-2xl font-bold text-green-600 mb-1">
+                {loading ? "..." : nationalStats ? `${Math.round(nationalStats.totalCapacity / 1000)}K` : "410K"}
+              </div>
               <div className="text-sm text-gray-600 dark:text-gray-400">Capacité Totale</div>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-blue-600 mb-1">{nationalStats.totalMatches}</div>
+              <div className="text-2xl font-bold text-blue-600 mb-1">
+                {loading ? "..." : nationalStats?.totalMatches || 32}
+              </div>
               <div className="text-sm text-gray-600 dark:text-gray-400">Matchs Prévus</div>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-purple-600 mb-1">2.5M</div>
+              <div className="text-2xl font-bold text-purple-600 mb-1">
+                {loading ? "..." : nationalStats ? `${(nationalStats.expectedVisitors / 1000000).toFixed(1)}M` : "2.5M"}
+              </div>
               <div className="text-sm text-gray-600 dark:text-gray-400">Visiteurs Attendus</div>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-orange-600 mb-1">{nationalStats.averageCriminalite}</div>
+              <div className="text-2xl font-bold text-orange-600 mb-1">
+                {loading ? "..." : nationalStats?.averageCriminalite || 30}
+              </div>
               <div className="text-sm text-gray-600 dark:text-gray-400">Criminalité Moy.</div>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-teal-600 mb-1">{nationalStats.averagePollution}</div>
+              <div className="text-2xl font-bold text-teal-600 mb-1">
+                {loading ? "..." : nationalStats?.averagePollution || 38}
+              </div>
               <div className="text-sm text-gray-600 dark:text-gray-400">Pollution Moy.</div>
             </CardContent>
           </Card>
@@ -165,25 +222,6 @@ export default function MoroccoOverviewUnified() {
           <CardContent>
             <InteractiveMap onCitySelect={handleCitySelect} />
 
-            {selectedCityFromMap && (
-              <div className="mt-6 p-4 bg-gradient-to-r from-red-50 to-green-50 dark:from-red-900/20 dark:to-green-900/20 rounded-lg border">
-                <h4 className="font-semibold text-lg mb-2">Ville sélectionnée: {selectedCityFromMap.name}</h4>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                  <div>
-                    <span className="font-medium">Criminalité:</span> {selectedCityFromMap.Indice_Criminalite}
-                  </div>
-                  <div>
-                    <span className="font-medium">Pollution:</span> {selectedCityFromMap.Indice_Pollution}
-                  </div>
-                  <div>
-                    <span className="font-medium">Infrastructure:</span> {selectedCityFromMap.Score_Infrastructures}/5
-                  </div>
-                  <div>
-                    <span className="font-medium">Risque Global:</span> {selectedCityFromMap.indice_global}
-                  </div>
-                </div>
-              </div>
-            )}
           </CardContent>
         </Card>
 
@@ -228,13 +266,15 @@ export default function MoroccoOverviewUnified() {
             <CardContent>
               <div className="space-y-4">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-blue-600 mb-2">{nationalStats.averageInfrastructure}/5</div>
+                  <div className="text-3xl font-bold text-blue-600 mb-2">
+                    {loading ? "..." : nationalStats?.averageInfrastructure || 3.5}/5
+                  </div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Score moyen d'infrastructure</p>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div
                     className="bg-blue-600 h-2 rounded-full"
-                    style={{ width: `${(nationalStats.averageInfrastructure / 5) * 100}%` }}
+                    style={{ width: `${((nationalStats?.averageInfrastructure || 3.5) / 5) * 100}%` }}
                   ></div>
                 </div>
               </div>
@@ -251,7 +291,9 @@ export default function MoroccoOverviewUnified() {
             <CardContent>
               <div className="space-y-4">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-purple-600 mb-2">410K</div>
+                  <div className="text-3xl font-bold text-purple-600 mb-2">
+                    {loading ? "..." : nationalStats ? `${Math.round(nationalStats.totalCapacity / 1000)}K` : "410K"}
+                  </div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Places totales disponibles</p>
                 </div>
                 <div className="text-sm text-center text-green-600 font-medium">

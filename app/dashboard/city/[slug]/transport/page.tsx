@@ -18,6 +18,7 @@ import {
   Users,
   Navigation,
   Wifi,
+  X,
 } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
 import Link from "next/link"
@@ -113,6 +114,7 @@ const moroccanCities: City[] = [
 export default function TransportPage() {
   const params = useParams()
   const [city, setCity] = useState<City | null>(null)
+  const [modalImage, setModalImage] = useState<string | null>(null)
   const [userData, setUserData] = useState<any>(null)
 
   useEffect(() => {
@@ -359,6 +361,20 @@ export default function TransportPage() {
                   </>
                 )}
               </div>
+              <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                <a 
+                  href="https://www.oncf-voyages.ma/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 text-sm font-medium"
+                >
+                  <Train className="h-4 w-4" />
+                  Réserver sur ONCF Voyages
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </a>
+              </div>
             </CardContent>
           </Card>
 
@@ -559,12 +575,13 @@ export default function TransportPage() {
                       <img
                         src="/images/TramRabat.jpg"
                         alt="Plan du tramway de Rabat"
-                        className="w-full h-auto max-h-96 object-contain transition-transform duration-300 group-hover:scale-105"
+                        className="w-full h-auto max-h-96 object-contain transition-transform duration-300 group-hover:scale-105 cursor-pointer"
                         loading="lazy"
+                        onClick={() => setModalImage('/images/TramRabat.jpg')}
                       />
                       <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300 flex items-center justify-center">
                         <button
-                          onClick={() => window.open('/images/TramRabat.jpg', '_blank')}
+                          onClick={() => setModalImage('/images/TramRabat.jpg')}
                           className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white dark:bg-gray-800 px-3 py-1 rounded-full text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
                         >
                           Cliquer pour agrandir
@@ -615,12 +632,13 @@ export default function TransportPage() {
                       <img
                         src="/images/BusRabat.jpg"
                         alt="Carte du réseau d'autobus Rabat-Salé-Temara"
-                        className="w-full h-auto max-h-96 object-contain transition-transform duration-300 group-hover:scale-105"
+                        className="w-full h-auto max-h-96 object-contain transition-transform duration-300 group-hover:scale-105 cursor-pointer"
                         loading="lazy"
+                        onClick={() => setModalImage('/images/BusRabat.jpg')}
                       />
                       <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300 flex items-center justify-center">
                         <button
-                          onClick={() => window.open('/images/BusRabat.jpg', '_blank')}
+                          onClick={() => setModalImage('/images/BusRabat.jpg')}
                           className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white dark:bg-gray-800 px-3 py-1 rounded-full text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
                         >
                           Cliquer pour agrandir
@@ -679,12 +697,13 @@ export default function TransportPage() {
                       <img
                         src="/images/TramCasa.jpg"
                         alt="Plan du tramway de Casablanca"
-                        className="w-full h-auto max-h-96 object-contain transition-transform duration-300 group-hover:scale-105"
+                        className="w-full h-auto max-h-96 object-contain transition-transform duration-300 group-hover:scale-105 cursor-pointer"
                         loading="lazy"
+                        onClick={() => setModalImage('/images/TramCasa.jpg')}
                       />
                       <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300 flex items-center justify-center">
                         <button
-                          onClick={() => window.open('/images/TramCasa.jpg', '_blank')}
+                          onClick={() => setModalImage('/images/TramCasa.jpg')}
                           className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white dark:bg-gray-800 px-3 py-1 rounded-full text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
                         >
                           Cliquer pour agrandir
@@ -735,12 +754,13 @@ export default function TransportPage() {
                       <img
                         src="/images/BusCasa.jpg"
                         alt="Carte du réseau de bus de Casablanca"
-                        className="w-full h-auto max-h-96 object-contain transition-transform duration-300 group-hover:scale-105"
+                        className="w-full h-auto max-h-96 object-contain transition-transform duration-300 group-hover:scale-105 cursor-pointer"
                         loading="lazy"
+                        onClick={() => setModalImage('/images/BusCasa.jpg')}
                       />
                       <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300 flex items-center justify-center">
                         <button
-                          onClick={() => window.open('/images/BusCasa.jpg', '_blank')}
+                          onClick={() => setModalImage('/images/BusCasa.jpg')}
                           className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white dark:bg-gray-800 px-3 py-1 rounded-full text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
                         >
                           Cliquer pour agrandir
@@ -799,12 +819,13 @@ export default function TransportPage() {
                       <img
                         src="/images/BusAgadir.jpg"
                         alt="Plan du réseau de bus du Grand Agadir"
-                        className="w-full h-auto max-h-96 object-contain transition-transform duration-300 group-hover:scale-105"
+                        className="w-full h-auto max-h-96 object-contain transition-transform duration-300 group-hover:scale-105 cursor-pointer"
                         loading="lazy"
+                        onClick={() => setModalImage('/images/BusAgadir.jpg')}
                       />
                       <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300 flex items-center justify-center">
                         <button
-                          onClick={() => window.open('/images/BusAgadir.jpg', '_blank')}
+                          onClick={() => setModalImage('/images/BusAgadir.jpg')}
                           className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white dark:bg-gray-800 px-3 py-1 rounded-full text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
                         >
                           Cliquer pour agrandir
@@ -822,6 +843,62 @@ export default function TransportPage() {
                       Ouvrir dans un nouvel onglet
                     </a>
                   </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        )}
+
+        {/* Section Marrakech */}
+        {city?.slug === "marrakech" && (
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="md:col-span-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Bus className="h-5 w-5 text-blue-600" />
+                    Plan du Réseau de Bus - Marrakech
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="text-sm text-gray-600 dark:text-gray-400">
+                    <p>Le réseau de bus urbain de Marrakech opéré par ALSA propose 15 lignes principales couvrant toute la ville.</p>
+                    <div className="mt-3 space-y-1">
+                      <p>• 15 lignes urbaines principales</p>
+                      <p>• Connexion à l'aéroport Marrakech-Ménara</p>
+                      <p>• Service de 6h à 22h</p>
+                      <p>• Tarif unique : 4 MAD</p>
+                    </div>
+                  </div>
+                  
+                  {/* Image de la carte des bus */}
+                  <div className="border rounded-lg overflow-hidden bg-gray-50 dark:bg-gray-800 group relative">
+                    <img
+                      src="/images/BusMarrakech.jpg"
+                      alt="Plan du réseau de bus de Marrakech"
+                      className="w-full h-auto max-h-96 object-contain transition-transform duration-300 group-hover:scale-105 cursor-pointer"
+                      loading="lazy"
+                      onClick={() => setModalImage('/images/BusMarrakech.jpg')}
+                    />
+                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300 flex items-center justify-center">
+                      <button
+                        onClick={() => setModalImage('/images/BusMarrakech.jpg')}
+                        className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white dark:bg-gray-800 px-3 py-1 rounded-full text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                      >
+                        Cliquer pour agrandir
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <a
+                    href="https://www.alsa.ma/en/marrakech/schedules"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 text-sm"
+                  >
+                    <MapPin className="h-4 w-4" />
+                    Ouvrir dans un nouvel onglet
+                  </a>
                 </CardContent>
               </Card>
             </div>
@@ -888,6 +965,29 @@ export default function TransportPage() {
           </Card>
         </div>
       </div>
+
+      {/* Modal pour afficher l'image en plein écran */}
+      {modalImage && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4"
+          onClick={() => setModalImage(null)}
+        >
+          <div className="relative max-w-7xl max-h-full">
+            <button
+              onClick={() => setModalImage(null)}
+              className="absolute top-4 right-4 bg-white dark:bg-gray-800 rounded-full p-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors z-10"
+            >
+              <X className="h-6 w-6 text-gray-700 dark:text-gray-300" />
+            </button>
+            <img
+              src={modalImage}
+              alt="Carte des transports"
+              className="max-w-full max-h-full object-contain rounded-lg"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+        </div>
+      )}
     </div>
   )
 }

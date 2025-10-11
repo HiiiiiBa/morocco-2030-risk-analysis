@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useMemo, useCallback } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -74,9 +74,9 @@ const calculerIndiceGlobal = (city: CityData): number => {
 }
 
 const getRiskColor = (indiceGlobal: number): string => {
-  if (indiceGlobal <= 39) return "#22c55e"
-  if (indiceGlobal <= 64) return "#eab308"
-  return "#ef4444"
+  if (indiceGlobal <= 39) return "#10b981"
+  if (indiceGlobal <= 64) return "#f59e0b"
+  return "#dc2626"
 }
 
 const getRiskLevel = (indiceGlobal: number): string => {
@@ -114,103 +114,651 @@ interface InteractiveMapProps {
   className?: string
 }
 
-export default function InteractiveMap({ onCitySelect, className = "" }: InteractiveMapProps) {
+export default function InteractiveMap({ onCitySelect, className }: InteractiveMapProps) {
   const [selectedCity, setSelectedCity] = useState<CityData | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null)
   const [searchError, setSearchError] = useState<string | null>(null)
   const [loadingWeather, setLoadingWeather] = useState(false)
-  const [cities, setCities] = useState<CityData[]>([])
   const [cityComments, setCityComments] = useState<{ [cityId: string]: CityComment[] }>({})
   const [newComment, setNewComment] = useState("")
   const [editingComment, setEditingComment] = useState<string | null>(null)
   const [editContent, setEditContent] = useState("")
-  const [userRating, setUserRating] = useState<UserRating>({ criminalite: 0, pollution: 0, infrastructure: 0 })
-  const [showRatingForm, setShowRatingForm] = useState(false)
+  const [userRating, setUserRating] = useState<UserRating>({
+    criminalite: 0,
+    pollution: 0,
+    infrastructure: 0,
+  })
+
   const mapRef = useRef<HTMLDivElement>(null)
   const mapInstanceRef = useRef<any>(null)
+  const markersAddedRef = useRef(false)
 
-  useEffect(() => {
+  const cities = useMemo(() => {
     const moroccanCities: CityData[] = [
-      {
-        id: "casablanca",
-        name: "Casablanca",
-        lat: 33.5731,
-        lng: -7.5898,
-        Indice_Criminalite: 62,
-        Indice_Pollution: 70,
-        Score_Infrastructures: 4,
-        riskLevel: "Moyen",
-      },
       {
         id: "rabat",
         name: "Rabat",
-        lat: 34.0209,
-        lng: -6.8416,
-        Indice_Criminalite: 40,
+        lat: 34.021845,
+        lng: -6.840893,
+        Indice_Criminalite: 30.12,
         Indice_Pollution: 55,
         Score_Infrastructures: 4.5,
-        riskLevel: "Moyen",
+        riskLevel: "Faible",
       },
       {
-        id: "fes",
-        name: "Fès",
-        lat: 34.0181,
-        lng: -5.0078,
-        Indice_Criminalite: 35,
-        Indice_Pollution: 45,
-        Score_Infrastructures: 3.5,
-        riskLevel: "Moyen",
-      },
-      {
-        id: "marrakech",
-        name: "Marrakech",
-        lat: 31.6295,
-        lng: -7.9811,
-        Indice_Criminalite: 50,
-        Indice_Pollution: 60,
-        Score_Infrastructures: 3.8,
-        riskLevel: "Moyen",
+        id: "casablanca",
+        name: "Casablanca",
+        lat: 33.594514,
+        lng: -7.620028,
+        Indice_Criminalite: 61.94,
+        Indice_Pollution: 55,
+        Score_Infrastructures: 4.8,
+        riskLevel: "Modéré",
       },
       {
         id: "tanger",
         name: "Tanger",
-        lat: 35.7595,
-        lng: -5.834,
-        Indice_Criminalite: 45,
-        Indice_Pollution: 50,
-        Score_Infrastructures: 3.2,
-        riskLevel: "Moyen",
+        lat: 35.7625681,
+        lng: -5.8295062,
+        Indice_Criminalite: 55.11,
+        Indice_Pollution: 59,
+        Score_Infrastructures: 3.8,
+        riskLevel: "Modéré",
       },
       {
         id: "agadir",
         name: "Agadir",
-        lat: 30.4278,
-        lng: -9.5981,
+        lat: 30.4205162,
+        lng: -9.5838532,
+        Indice_Criminalite: 39.12,
+        Indice_Pollution: 75,
+        Score_Infrastructures: 3.4,
+        riskLevel: "Faible",
+      },
+      {
+        id: "marrakech",
+        name: "Marrakech",
+        lat: 31.6258257,
+        lng: -7.9891608,
+        Indice_Criminalite: 54.45,
+        Indice_Pollution: 57,
+        Score_Infrastructures: 2.5,
+        riskLevel: "Modéré",
+      },
+      {
+        id: "fes",
+        name: "Fès",
+        lat: 34.0346534,
+        lng: -5.0161926,
+        Indice_Criminalite: 60.5,
+        Indice_Pollution: 55,
+        Score_Infrastructures: 2,
+        riskLevel: "Modéré",
+      },
+      {
+        id: "tetouan",
+        name: "Tétouan",
+        lat: 35.570175,
+        lng: -5.3742776,
+        Indice_Criminalite: 22.09,
+        Indice_Pollution: 60,
+        Score_Infrastructures: 3.6,
+        riskLevel: "Faible",
+      },
+      {
+        id: "safi",
+        name: "Safi",
+        lat: 32.299424,
+        lng: -9.239533,
+        Indice_Criminalite: 34.71,
+        Indice_Pollution: 68,
+        Score_Infrastructures: 3,
+        riskLevel: "Faible",
+      },
+      {
+        id: "oujda",
+        name: "Oujda",
+        lat: 34.677874,
+        lng: -1.929306,
+        Indice_Criminalite: 44.65,
+        Indice_Pollution: 58,
+        Score_Infrastructures: 3,
+        riskLevel: "Modéré",
+      },
+      {
+        id: "nador",
+        name: "Nador",
+        lat: 35.1739922,
+        lng: -2.9281198,
+        Indice_Criminalite: 39.23,
+        Indice_Pollution: 58,
+        Score_Infrastructures: 2.9,
+        riskLevel: "Faible",
+      },
+      {
+        id: "mohammedia",
+        name: "Mohammedia",
+        lat: 33.6958383,
+        lng: -7.3893292,
+        Indice_Criminalite: 33.34,
+        Indice_Pollution: 54,
+        Score_Infrastructures: 2.5,
+        riskLevel: "Faible",
+      },
+      {
+        id: "meknes",
+        name: "Meknès",
+        lat: 33.8984131,
+        lng: -5.5321582,
+        Indice_Criminalite: 50.45,
+        Indice_Pollution: 54,
+        Score_Infrastructures: 3.2,
+        riskLevel: "Modéré",
+      },
+      {
+        id: "larache",
+        name: "Larache",
+        lat: 35.1952327,
+        lng: -6.152913,
+        Indice_Criminalite: 35,
+        Indice_Pollution: 57,
+        Score_Infrastructures: 2.5,
+        riskLevel: "Faible",
+      },
+      {
+        id: "el_jadida",
+        name: "El Jadida",
+        lat: 33.2433309,
+        lng: -8.49884,
+        Indice_Criminalite: 42.08,
+        Indice_Pollution: 57,
+        Score_Infrastructures: 2.5,
+        riskLevel: "Faible",
+      },
+      {
+        id: "kenitra",
+        name: "Kénitra",
+        lat: 34.26457,
+        lng: -6.570169,
+        Indice_Criminalite: 45.81,
+        Indice_Pollution: 54,
+        Score_Infrastructures: 3.8,
+        riskLevel: "Faible",
+      },
+      {
+        id: "settat",
+        name: "Settat",
+        lat: 33.002397,
+        lng: -7.619867,
+        Indice_Criminalite: 46.25,
+        Indice_Pollution: 55,
+        Score_Infrastructures: 2.1,
+        riskLevel: "Modéré",
+      },
+      {
+        id: "sidi_slimane",
+        name: "Sidi Slimane",
+        lat: 34.259878,
+        lng: -5.927253,
+        Indice_Criminalite: 22.46,
+        Indice_Pollution: 54,
+        Score_Infrastructures: 2.7,
+        riskLevel: "Faible",
+      },
+      {
+        id: "al_hoceima",
+        name: "Al Hoceima",
+        lat: 35.245114,
+        lng: -3.930186,
+        Indice_Criminalite: 32.41,
+        Indice_Pollution: 60,
+        Score_Infrastructures: 4,
+        riskLevel: "Faible",
+      },
+      {
+        id: "berrechid",
+        name: "Berrechid",
+        lat: 33.2676746,
+        lng: -7.5811465,
         Indice_Criminalite: 25,
-        Indice_Pollution: 35,
-        Score_Infrastructures: 4.2,
+        Indice_Pollution: 55,
+        Score_Infrastructures: 1.8,
+        riskLevel: "Faible",
+      },
+      {
+        id: "guelmim",
+        name: "Guelmim",
+        lat: 28.9863852,
+        lng: -10.0574351,
+        Indice_Criminalite: 40,
+        Indice_Pollution: 69,
+        Score_Infrastructures: 2.1,
+        riskLevel: "Modéré",
+      },
+      {
+        id: "ouarzazate",
+        name: "Ouarzazate",
+        lat: 30.920193,
+        lng: -6.910923,
+        Indice_Criminalite: 24.53,
+        Indice_Pollution: 65,
+        Score_Infrastructures: 3,
+        riskLevel: "Faible",
+      },
+      {
+        id: "dakhla",
+        name: "Dakhla",
+        lat: 23.6940663,
+        lng: -15.9431274,
+        Indice_Criminalite: 30.2,
+        Indice_Pollution: 129,
+        Score_Infrastructures: 2.5,
+        riskLevel: "Modéré",
+      },
+      {
+        id: "laayoune",
+        name: "Laâyoune",
+        lat: 27.154512,
+        lng: -13.1953921,
+        Indice_Criminalite: 32.43,
+        Indice_Pollution: 65,
+        Score_Infrastructures: 3.7,
+        riskLevel: "Faible",
+      },
+      {
+        id: "er_rachidia",
+        name: "Er Rachidia",
+        lat: 31.929089,
+        lng: -4.4340807,
+        Indice_Criminalite: 23.4,
+        Indice_Pollution: 67,
+        Score_Infrastructures: 2.4,
+        riskLevel: "Faible",
+      },
+      {
+        id: "beni_mellal",
+        name: "Beni Mellal",
+        lat: 32.334193,
+        lng: -6.335335,
+        Indice_Criminalite: 40.4,
+        Indice_Pollution: 56,
+        Score_Infrastructures: 2.5,
+        riskLevel: "Faible",
+      },
+      {
+        id: "essaouira",
+        name: "Essaouira",
+        lat: 31.5118281,
+        lng: -9.7620903,
+        Indice_Criminalite: 19.4,
+        Indice_Pollution: 68,
+        Score_Infrastructures: 2.1,
+        riskLevel: "Faible",
+      },
+      {
+        id: "sale",
+        name: "Salé",
+        lat: 34.044889,
+        lng: -6.814017,
+        Indice_Criminalite: 61.03,
+        Indice_Pollution: 55,
+        Score_Infrastructures: 4.1,
+        riskLevel: "Modéré",
+      },
+      {
+        id: "taroudant",
+        name: "Taroudant",
+        lat: 30.470651,
+        lng: -8.877922,
+        Indice_Criminalite: 28.4,
+        Indice_Pollution: 77,
+        Score_Infrastructures: 1.5,
+        riskLevel: "Faible",
+      },
+      {
+        id: "ifrane",
+        name: "Ifrane",
+        lat: 33.527605,
+        lng: -5.107408,
+        Indice_Criminalite: 10.91,
+        Indice_Pollution: 55,
+        Score_Infrastructures: 2.6,
+        riskLevel: "Faible",
+      },
+      {
+        id: "chefchaouen",
+        name: "Chefchaouen",
+        lat: 35.1700832,
+        lng: -5.2766583,
+        Indice_Criminalite: 14.59,
+        Indice_Pollution: 58,
+        Score_Infrastructures: 2.7,
+        riskLevel: "Faible",
+      },
+      {
+        id: "merzouga",
+        name: "Merzouga",
+        lat: 31.0999166,
+        lng: -4.0140878,
+        Indice_Criminalite: 19.54,
+        Indice_Pollution: 81,
+        Score_Infrastructures: 2.2,
+        riskLevel: "Faible",
+      },
+      {
+        id: "khenifra",
+        name: "Khénifra",
+        lat: 32.9357718,
+        lng: -5.6696504,
+        Indice_Criminalite: 21.44,
+        Indice_Pollution: 54,
+        Score_Infrastructures: 3.3,
+        riskLevel: "Faible",
+      },
+      {
+        id: "tiznit",
+        name: "Tiznit",
+        lat: 29.698624,
+        lng: -9.7312815,
+        Indice_Criminalite: 20.32,
+        Indice_Pollution: 78,
+        Score_Infrastructures: 3.5,
+        riskLevel: "Faible",
+      },
+      {
+        id: "ben_guerir",
+        name: "Ben Guerir",
+        lat: 32.239034,
+        lng: -7.958131,
+        Indice_Criminalite: 25.64,
+        Indice_Pollution: 62,
+        Score_Infrastructures: 2.3,
+        riskLevel: "Faible",
+      },
+      {
+        id: "inzegane",
+        name: "Inzegane",
+        lat: 33.5563151,
+        lng: -7.6006099,
+        Indice_Criminalite: 37.59,
+        Indice_Pollution: 77,
+        Score_Infrastructures: 3,
+        riskLevel: "Modéré",
+      },
+      {
+        id: "asilah",
+        name: "Asilah",
+        lat: 35.461928,
+        lng: -6.036545,
+        Indice_Criminalite: 15.03,
+        Indice_Pollution: 58,
+        Score_Infrastructures: 3.7,
+        riskLevel: "Faible",
+      },
+      {
+        id: "azilal",
+        name: "Azilal",
+        lat: 31.959295,
+        lng: -6.570991,
+        Indice_Criminalite: 20.48,
+        Indice_Pollution: 57,
+        Score_Infrastructures: 1.5,
+        riskLevel: "Faible",
+      },
+      {
+        id: "sidi_ifni",
+        name: "Sidi Ifni",
+        lat: 29.3791253,
+        lng: -10.1715632,
+        Indice_Criminalite: 21.4,
+        Indice_Pollution: 69,
+        Score_Infrastructures: 2,
+        riskLevel: "Faible",
+      },
+      {
+        id: "tinghir",
+        name: "Tinghir",
+        lat: 31.52133,
+        lng: -5.531164,
+        Indice_Criminalite: 21.34,
+        Indice_Pollution: 59,
+        Score_Infrastructures: 2.2,
+        riskLevel: "Faible",
+      },
+      {
+        id: "khouribga",
+        name: "Khouribga",
+        lat: 32.8856482,
+        lng: -6.908798,
+        Indice_Criminalite: 29.3,
+        Indice_Pollution: 55,
+        Score_Infrastructures: 2.5,
+        riskLevel: "Faible",
+      },
+      {
+        id: "khemisset",
+        name: "Khémisset",
+        lat: 33.830287,
+        lng: -6.072605,
+        Indice_Criminalite: 33.21,
+        Indice_Pollution: 54,
+        Score_Infrastructures: 2.3,
+        riskLevel: "Faible",
+      },
+      {
+        id: "berkane",
+        name: "Berkane",
+        lat: 34.9266755,
+        lng: -2.3294087,
+        Indice_Criminalite: 30.58,
+        Indice_Pollution: 57,
+        Score_Infrastructures: 2,
+        riskLevel: "Faible",
+      },
+      {
+        id: "fquih_ben_salah",
+        name: "Fquih Ben Salah",
+        lat: 32.4212148,
+        lng: -6.7470785,
+        Indice_Criminalite: 30.39,
+        Indice_Pollution: 55,
+        Score_Infrastructures: 1.5,
+        riskLevel: "Faible",
+      },
+      {
+        id: "ksar_el_kebir",
+        name: "Ksar El Kebir",
+        lat: 34.999218,
+        lng: -5.898724,
+        Indice_Criminalite: 35.4,
+        Indice_Pollution: 56,
+        Score_Infrastructures: 2.1,
+        riskLevel: "Faible",
+      },
+      {
+        id: "martil",
+        name: "Martil",
+        lat: 35.617441,
+        lng: -5.274154,
+        Indice_Criminalite: 23.49,
+        Indice_Pollution: 61,
+        Score_Infrastructures: 3.1,
+        riskLevel: "Faible",
+      },
+      {
+        id: "sidi_kacem",
+        name: "Sidi Kacem",
+        lat: 34.226412,
+        lng: -5.711434,
+        Indice_Criminalite: 22.5,
+        Indice_Pollution: 55,
+        Score_Infrastructures: 2.9,
+        riskLevel: "Faible",
+      },
+      {
+        id: "taza",
+        name: "Taza",
+        lat: 34.230155,
+        lng: -4.010104,
+        Indice_Criminalite: 17.49,
+        Indice_Pollution: 58,
+        Score_Infrastructures: 1.9,
+        riskLevel: "Faible",
+      },
+      {
+        id: "azrou",
+        name: "Azrou",
+        lat: 33.436117,
+        lng: -5.221913,
+        Indice_Criminalite: 18.45,
+        Indice_Pollution: 55,
+        Score_Infrastructures: 1.8,
+        riskLevel: "Faible",
+      },
+      {
+        id: "ait_melloul",
+        name: "Ait Melloul",
+        lat: 30.3387947,
+        lng: -9.5044701,
+        Indice_Criminalite: 35,
+        Indice_Pollution: 57,
+        Score_Infrastructures: 2.3,
         riskLevel: "Faible",
       },
     ]
-    setCities(moroccanCities)
+    return moroccanCities
   }, [])
+
+  const addAllMarkers = useCallback(() => {
+    console.log("[v0] addAllMarkers called, markersAdded:", markersAddedRef.current)
+
+    if (markersAddedRef.current) {
+      console.log("[v0] Markers already added, skipping")
+      return
+    }
+
+    if (mapInstanceRef.current && cities.length > 0 && (window as any).L) {
+      const L = (window as any).L
+      console.log("[v0] Starting to add markers for", cities.length, "cities")
+
+      mapInstanceRef.current.eachLayer((layer: any) => {
+        if (layer instanceof L.Marker) {
+          mapInstanceRef.current.removeLayer(layer)
+        }
+      })
+
+      if (!mapInstanceRef.current.getContainer()) {
+        console.log("[v0] Map container not ready, retrying...")
+        setTimeout(() => addAllMarkers(), 500)
+        return
+      }
+
+      cities.forEach((city) => {
+        const indiceGlobal = calculerIndiceGlobal(city)
+        const color = getRiskColor(indiceGlobal)
+
+        console.log(`[v0] Adding marker for ${city.name} at [${city.lat}, ${city.lng}]`)
+
+        const customIcon = L.divIcon({
+          className: "custom-marker",
+          html: `<div style="
+            background-color: ${color};
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4), 0 1px 4px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s ease;
+          ">
+            <div style="
+              width: 6px;
+              height: 6px;
+              background-color: white;
+              border-radius: 50%;
+              opacity: 0.95;
+            "></div>
+          </div>`,
+          iconSize: [26, 26],
+          iconAnchor: [13, 13],
+        })
+
+        const cityData = { ...city }
+
+        const marker = L.marker([cityData.lat, cityData.lng], { icon: customIcon })
+          .addTo(mapInstanceRef.current)
+          .on("click", () => {
+            console.log("[v0] Marker clicked for city:", cityData.name)
+            const cityWithGlobal = { ...cityData, indice_global: calculerIndiceGlobal(cityData) }
+            setSelectedCity(cityWithGlobal)
+            fetchWeatherData(cityData)
+            onCitySelect?.(cityWithGlobal)
+          })
+
+        marker.bindPopup(`
+          <div style="padding: 10px; min-width: 180px; text-align: center;">
+            <h3 style="font-weight: bold; font-size: 16px; margin-bottom: 6px; color: #333;">${cityData.name}</h3>
+            <div style="margin-top: 6px;">
+              <span style="display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 12px; background-color: ${color}; color: white; font-weight: 600;">
+                ${getRiskLevel(indiceGlobal)} (${indiceGlobal})
+              </span>
+            </div>
+            <div style="margin-top: 6px; font-size: 11px; color: #666;">
+              Cliquez pour plus de détails
+            </div>
+          </div>
+        `)
+      })
+
+      markersAddedRef.current = true
+      console.log("[v0] Finished adding", cities.length, "markers")
+    } else {
+      console.log("[v0] Cannot add markers - missing requirements:", {
+        mapInstance: !!mapInstanceRef.current,
+        citiesCount: cities.length,
+        leafletLoaded: !!(window as any).L,
+      })
+    }
+  }, [cities, onCitySelect])
 
   useEffect(() => {
     if (typeof window !== "undefined" && mapRef.current && !mapInstanceRef.current) {
-      // Load Leaflet CSS
+      console.log("[v0] Initializing map...")
+
       const link = document.createElement("link")
       link.rel = "stylesheet"
       link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
       document.head.appendChild(link)
 
-      // Load Leaflet JS
+      const style = document.createElement("style")
+      style.textContent = `
+        .custom-marker:hover {
+          transform: scale(1.2) !important;
+          z-index: 1000 !important;
+        }
+        .custom-marker {
+          transition: all 0.2s ease !important;
+        }
+        .leaflet-popup-content-wrapper {
+          border-radius: 8px !important;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+        }
+        .leaflet-popup-tip {
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+        }
+      `
+      document.head.appendChild(style)
+
       const script = document.createElement("script")
       script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
       script.onload = () => {
         const L = (window as any).L
 
-        // Fix for default markers
         delete (L.Icon.Default.prototype as any)._getIconUrl
         L.Icon.Default.mergeOptions({
           iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
@@ -236,89 +784,22 @@ export default function InteractiveMap({ onCitySelect, className = "" }: Interac
         }).addTo(mapInstance)
 
         mapInstanceRef.current = mapInstance
+        console.log("[v0] Map initialized successfully")
 
         setTimeout(() => {
           mapInstance.invalidateSize()
-        }, 100)
+          setTimeout(() => {
+            addAllMarkers()
+          }, 300)
+        }, 200)
       }
       document.head.appendChild(script)
     }
-  }, [])
-
-  useEffect(() => {
-    if (mapInstanceRef.current && cities.length > 0 && (window as any).L) {
-      const L = (window as any).L
-
-      // Clear existing markers
-      mapInstanceRef.current.eachLayer((layer: any) => {
-        if (layer instanceof L.Marker) {
-          mapInstanceRef.current.removeLayer(layer)
-        }
-      })
-
-      // Add markers for each city
-      cities.forEach((city) => {
-        const indiceGlobal = calculerIndiceGlobal(city)
-        const color = getRiskColor(indiceGlobal)
-
-        const customIcon = L.divIcon({
-          className: "custom-marker",
-          html: `<div style="
-            background-color: ${color}; 
-            width: 24px; 
-            height: 24px; 
-            border-radius: 50%; 
-            border: 4px solid white; 
-            box-shadow: 0 4px 8px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.2); 
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-            position: relative;
-          ">
-            <div style="
-              width: 8px; 
-              height: 8px; 
-              background-color: white; 
-              border-radius: 50%; 
-              opacity: 0.9;
-            "></div>
-          </div>`,
-          iconSize: [32, 32],
-          iconAnchor: [16, 16],
-        })
-
-        const marker = L.marker([city.lat, city.lng], { icon: customIcon })
-          .addTo(mapInstanceRef.current)
-          .on("click", () => {
-            const cityWithGlobal = { ...city, indice_global: indiceGlobal }
-            setSelectedCity(cityWithGlobal)
-            fetchWeatherData(city)
-            onCitySelect?.(cityWithGlobal)
-            mapInstanceRef.current.setView([city.lat, city.lng], 10)
-          })
-
-        marker.bindPopup(`
-          <div style="padding: 8px; min-width: 200px;">
-            <h3 style="font-weight: bold; font-size: 16px; margin-bottom: 8px;">${city.name}</h3>
-            <div style="margin-top: 8px;">
-              <span style="display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px; background-color: ${color}; color: white;">
-                Risque ${getRiskLevel(indiceGlobal)} (${indiceGlobal})
-              </span>
-            </div>
-          </div>
-        `)
-      })
-
-      setTimeout(() => {
-        mapInstanceRef.current.invalidateSize()
-      }, 100)
-    }
-  }, [cities])
+  }, [addAllMarkers])
 
   const fetchWeatherData = async (city: CityData) => {
     setLoadingWeather(true)
     try {
-      // Mock weather data for demo
       const mockWeather: WeatherData = {
         temperature: Math.round(Math.random() * 15 + 15),
         description: ["ensoleillé", "nuageux", "partiellement nuageux"][Math.floor(Math.random() * 3)],
@@ -349,7 +830,6 @@ export default function InteractiveMap({ onCitySelect, className = "" }: Interac
       onCitySelect?.(cityWithGlobal)
       setSearchError(null)
 
-      // Center map on found city
       if (mapInstanceRef.current) {
         mapInstanceRef.current.setView([foundCity.lat, foundCity.lng], 10)
       }
@@ -364,11 +844,11 @@ export default function InteractiveMap({ onCitySelect, className = "" }: Interac
     const comment: CityComment = {
       id: Date.now().toString(),
       cityId: selectedCity.id,
-      author: "Utilisateur", // In real app, get from auth
+      author: "Utilisateur",
       content: newComment,
       timestamp: new Date(),
       likes: 0,
-      userRatings: showRatingForm ? { ...userRating } : undefined,
+      userRatings: { ...userRating },
     }
 
     setCityComments((prev) => ({
@@ -378,12 +858,10 @@ export default function InteractiveMap({ onCitySelect, className = "" }: Interac
 
     setNewComment("")
     setUserRating({ criminalite: 0, pollution: 0, infrastructure: 0 })
-    setShowRatingForm(false)
   }
 
   const deleteComment = (commentId: string) => {
     if (!selectedCity) return
-
     setCityComments((prev) => ({
       ...prev,
       [selectedCity.id]: prev[selectedCity.id]?.filter((c) => c.id !== commentId) || [],
@@ -397,20 +875,17 @@ export default function InteractiveMap({ onCitySelect, className = "" }: Interac
 
   const saveEditComment = () => {
     if (!selectedCity || !editingComment) return
-
     setCityComments((prev) => ({
       ...prev,
       [selectedCity.id]:
         prev[selectedCity.id]?.map((c) => (c.id === editingComment ? { ...c, content: editContent } : c)) || [],
     }))
-
     setEditingComment(null)
     setEditContent("")
   }
 
   const likeComment = (commentId: string) => {
     if (!selectedCity) return
-
     setCityComments((prev) => ({
       ...prev,
       [selectedCity.id]:
@@ -459,237 +934,250 @@ export default function InteractiveMap({ onCitySelect, className = "" }: Interac
   )
 
   return (
-    <div className={`grid grid-cols-1 lg:grid-cols-4 gap-6 ${className}`}>
-      {/* Left sidebar with controls */}
-      <div className="lg:col-span-1 space-y-4">
-        {/* Search */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Rechercher une ville</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex gap-2">
-              <Input
-                placeholder="Nom de la ville..."
-                value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value)
-                  setSearchError(null)
-                }}
-                onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-              />
-              <Button onClick={handleSearch} size="sm">
-                <Search className="h-4 w-4" />
-              </Button>
-            </div>
-            {searchError && (
-              <div className="mt-2 text-sm text-red-600 flex items-center gap-1">
-                <X className="h-4 w-4" />
-                <span>{searchError}</span>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Legend */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Légende</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex items-center gap-3">
-              <div className="w-4 h-4 rounded-full bg-green-500"></div>
-              <span className="text-sm">Faible (0-39)</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-4 h-4 rounded-full bg-yellow-500"></div>
-              <span className="text-sm">Moyen (40-64)</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-4 h-4 rounded-full bg-red-500"></div>
-              <span className="text-sm">Élevé (65-100)</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Weather */}
-        {selectedCity && (
+    <div className={`space-y-2 ${className}`}>
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        {/* Left sidebar with controls */}
+        <div className="lg:col-span-1 space-y-4">
+          {/* Search */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Cloud className="h-5 w-5" />
-                Météo - {selectedCity.name}
-              </CardTitle>
+              <CardTitle>Rechercher une ville</CardTitle>
             </CardHeader>
             <CardContent>
-              {loadingWeather ? (
-                <div className="text-center py-4">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto"></div>
-                  <p className="text-sm text-gray-600 mt-2">Chargement...</p>
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Nom de la ville..."
+                  value={searchTerm}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value)
+                    setSearchError(null)
+                  }}
+                  onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+                />
+                <Button onClick={handleSearch} size="sm">
+                  <Search className="h-4 w-4" />
+                </Button>
+              </div>
+              {searchError && (
+                <div className="mt-2 text-sm text-red-600 flex items-center gap-1">
+                  <X className="h-4 w-4" />
+                  <span>{searchError}</span>
                 </div>
-              ) : weatherData ? (
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      {(() => {
-                        const WeatherIcon = getWeatherIcon(weatherData.description)
-                        return <WeatherIcon className="h-6 w-6 text-blue-500" />
-                      })()}
-                      <span className="text-2xl font-bold">{weatherData.temperature}°C</span>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-sm text-gray-600 dark:text-gray-400 capitalize">
-                        {weatherData.description}
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Legend */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Légende</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="w-4 h-4 rounded-full bg-green-500"></div>
+                <span className="text-sm">Faible (0-39)</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-4 h-4 rounded-full bg-yellow-500"></div>
+                <span className="text-sm">Moyen (40-64)</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-4 h-4 rounded-full bg-red-500"></div>
+                <span className="text-sm">Élevé (65-100)</span>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Weather */}
+          {selectedCity && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Cloud className="h-5 w-5" />
+                  Météo - {selectedCity.name}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {loadingWeather ? (
+                  <div className="text-center py-4">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto"></div>
+                    <p className="text-sm text-gray-600 mt-2">Chargement...</p>
+                  </div>
+                ) : weatherData ? (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        {(() => {
+                          const WeatherIcon = getWeatherIcon(weatherData.description)
+                          return <WeatherIcon className="h-6 w-6 text-blue-500" />
+                        })()}
+                        <span className="text-2xl font-bold">{weatherData.temperature}°C</span>
                       </div>
-                      <div className="text-xs text-gray-500">Ressenti {weatherData.feelsLike}°C</div>
+                      <div className="text-right">
+                        <div className="text-sm text-gray-600 dark:text-gray-400 capitalize">
+                          {weatherData.description}
+                        </div>
+                        <div className="text-xs text-gray-500">Ressenti {weatherData.feelsLike}°C</div>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3 text-sm">
+                      <div className="flex items-center gap-2">
+                        <Droplets className="h-4 w-4 text-blue-500" />
+                        <span>{weatherData.humidity}%</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Wind className="h-4 w-4 text-gray-500" />
+                        <span>{weatherData.windSpeed} km/h</span>
+                      </div>
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-3 text-sm">
-                    <div className="flex items-center gap-2">
-                      <Droplets className="h-4 w-4 text-blue-500" />
-                      <span>{weatherData.humidity}%</span>
+                ) : (
+                  <p className="text-sm text-gray-600">Sélectionnez une ville pour voir la météo</p>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* City details */}
+          {selectedCity && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MapPin className="h-5 w-5" />
+                  {selectedCity.name}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div
+                    className="text-center p-3 rounded-lg border"
+                    style={{
+                      backgroundColor: `${getCriminaliteColor(selectedCity.Indice_Criminalite)}20`,
+                      borderColor: getCriminaliteColor(selectedCity.Indice_Criminalite),
+                    }}
+                  >
+                    <div
+                      className="text-2xl font-bold"
+                      style={{
+                        color: getCriminaliteColor(selectedCity.Indice_Criminalite),
+                      }}
+                    >
+                      {selectedCity.Indice_Criminalite.toFixed(2)}
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Wind className="h-4 w-4 text-gray-500" />
-                      <span>{weatherData.windSpeed} km/h</span>
+                    <div className="text-xs text-gray-600 dark:text-gray-400">Criminalité</div>
+                  </div>
+                  <div
+                    className="text-center p-3 rounded-lg border"
+                    style={{
+                      backgroundColor: `${getPollutionColor(selectedCity.Indice_Pollution)}20`,
+                      borderColor: getPollutionColor(selectedCity.Indice_Pollution),
+                    }}
+                  >
+                    <div
+                      className="text-2xl font-bold"
+                      style={{
+                        color: getPollutionColor(selectedCity.Indice_Pollution),
+                      }}
+                    >
+                      {selectedCity.Indice_Pollution}
                     </div>
+                    <div className="text-xs text-gray-600 dark:text-gray-400">Pollution</div>
                   </div>
                 </div>
-              ) : (
-                <p className="text-sm text-gray-600">Sélectionnez une ville pour voir la météo</p>
-              )}
+
+                <div className="text-center p-3 rounded-lg border border-blue-200 bg-blue-50 dark:bg-blue-900/20">
+                  <div className="flex items-center justify-center gap-1 mb-1">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        className={`h-4 w-4 ${i < selectedCity.Score_Infrastructures ? `${getInfrastructureLevel(selectedCity.Score_Infrastructures)} fill-current` : "text-gray-300"}`}
+                      />
+                    ))}
+                  </div>
+                  <div className="text-xs text-gray-600 dark:text-gray-400">
+                    Infrastructure ({selectedCity.Score_Infrastructures}/5)
+                  </div>
+                </div>
+
+                {selectedCity && (
+                  <div className="text-center p-4 bg-gradient-to-r from-red-100 to-green-100 dark:from-red-900 dark:to-green-900 rounded-lg">
+                    <div
+                      className="text-3xl font-bold"
+                      style={{
+                        color: getRiskColor(calculerIndiceGlobal(selectedCity)),
+                      }}
+                    >
+                      {calculerIndiceGlobal(selectedCity)}
+                    </div>
+                    <div className="text-sm font-medium">Indice Global</div>
+                    <Badge
+                      className="mt-2"
+                      style={{
+                        backgroundColor: getRiskColor(calculerIndiceGlobal(selectedCity)),
+                        color: "white",
+                      }}
+                    >
+                      Risque {getRiskLevel(calculerIndiceGlobal(selectedCity))}
+                    </Badge>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+        </div>
+
+        {/* Main map */}
+        <div className="lg:col-span-3">
+          <Card className="h-[600px] overflow-hidden">
+            <CardContent className="p-4 h-full">
+              <div ref={mapRef} className="w-full h-full rounded-lg" style={{ minHeight: "500px" }} />
             </CardContent>
           </Card>
-        )}
+        </div>
+      </div>
 
-        {/* City details */}
-        {selectedCity && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <MapPin className="h-5 w-5" />
-                {selectedCity.name}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div
-                  className="text-center p-3 rounded-lg border"
-                  style={{
-                    backgroundColor: `${getCriminaliteColor(selectedCity.Indice_Criminalite)}20`,
-                    borderColor: getCriminaliteColor(selectedCity.Indice_Criminalite),
-                  }}
-                >
-                  <div
-                    className="text-2xl font-bold"
-                    style={{ color: getCriminaliteColor(selectedCity.Indice_Criminalite) }}
-                  >
-                    {selectedCity.Indice_Criminalite}
-                  </div>
-                  <div className="text-xs text-gray-600 dark:text-gray-400">Criminalité</div>
-                </div>
-                <div
-                  className="text-center p-3 rounded-lg border"
-                  style={{
-                    backgroundColor: `${getPollutionColor(selectedCity.Indice_Pollution)}20`,
-                    borderColor: getPollutionColor(selectedCity.Indice_Pollution),
-                  }}
-                >
-                  <div
-                    className="text-2xl font-bold"
-                    style={{ color: getPollutionColor(selectedCity.Indice_Pollution) }}
-                  >
-                    {selectedCity.Indice_Pollution}
-                  </div>
-                  <div className="text-xs text-gray-600 dark:text-gray-400">Pollution</div>
-                </div>
-              </div>
-              <div className="text-center p-3 rounded-lg border border-blue-200 bg-blue-50 dark:bg-blue-900/20">
-                <div className="flex items-center justify-center gap-1 mb-1">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className={`h-4 w-4 ${i < selectedCity.Score_Infrastructures ? `${getInfrastructureLevel(selectedCity.Score_Infrastructures)} fill-current` : "text-gray-300"}`}
-                    />
-                  ))}
-                </div>
-                <div className="text-xs text-gray-600 dark:text-gray-400">
-                  Infrastructure ({selectedCity.Score_Infrastructures}/5)
-                </div>
-              </div>
-              {selectedCity && (
-                <div className="text-center p-4 bg-gradient-to-r from-red-100 to-green-100 dark:from-red-900 dark:to-green-900 rounded-lg">
-                  <div
-                    className="text-3xl font-bold"
-                    style={{ color: getRiskColor(calculerIndiceGlobal(selectedCity)) }}
-                  >
-                    {calculerIndiceGlobal(selectedCity)}
-                  </div>
-                  <div className="text-sm font-medium">Indice Global</div>
-                  <Badge
-                    className="mt-2"
-                    style={{ backgroundColor: getRiskColor(calculerIndiceGlobal(selectedCity)), color: "white" }}
-                  >
-                    Risque {getRiskLevel(calculerIndiceGlobal(selectedCity))}
-                  </Badge>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Comments */}
-        {selectedCity && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <MessageCircle className="h-5 w-5" />
-                Commentaires - {selectedCity.name}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Add new comment */}
-              <div className="space-y-3">
+      {selectedCity && (
+        <Card className="w-full">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <MessageCircle className="h-5 w-5" />
+              Commentaires et Évaluations
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Left column: Add comment form */}
+              <div className="space-y-4">
+                <h3 className="font-semibold text-lg">Ajouter un commentaire</h3>
                 <Textarea
                   placeholder="Partagez votre expérience sur cette ville..."
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
-                  className="min-h-[80px]"
+                  className="min-h-[100px]"
                 />
 
-                {/* Rating toggle */}
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant={showRatingForm ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setShowRatingForm(!showRatingForm)}
-                  >
-                    <Star className="h-4 w-4 mr-1" />
-                    Évaluer la ville
-                  </Button>
+                {/* Rating form always visible */}
+                <div className="space-y-4 p-4 border rounded-lg bg-gray-50 dark:bg-gray-800">
+                  <h4 className="font-medium">Évaluer la ville</h4>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">
+                    Votre évaluation sera publiée avec votre commentaire
+                  </p>
+                  {renderSliderRating(
+                    userRating.criminalite,
+                    (rating) => setUserRating((prev) => ({ ...prev, criminalite: rating })),
+                    "Sécurité",
+                  )}
+                  {renderSliderRating(
+                    userRating.pollution,
+                    (rating) => setUserRating((prev) => ({ ...prev, pollution: rating })),
+                    "Propreté",
+                  )}
+                  {renderStarRating(
+                    userRating.infrastructure,
+                    (rating) => setUserRating((prev) => ({ ...prev, infrastructure: rating })),
+                    "Infrastructure",
+                  )}
                 </div>
-
-                {/* Rating form */}
-                {showRatingForm && (
-                  <div className="space-y-4 p-4 border rounded-lg bg-gray-50 dark:bg-gray-800">
-                    <h4 className="font-medium text-sm">Votre évaluation:</h4>
-                    {renderSliderRating(
-                      userRating.criminalite,
-                      (rating) => setUserRating((prev) => ({ ...prev, criminalite: rating })),
-                      "Sécurité",
-                    )}
-                    {renderSliderRating(
-                      userRating.pollution,
-                      (rating) => setUserRating((prev) => ({ ...prev, pollution: rating })),
-                      "Propreté",
-                    )}
-                    {renderStarRating(
-                      userRating.infrastructure,
-                      (rating) => setUserRating((prev) => ({ ...prev, infrastructure: rating })),
-                      "Infrastructure",
-                    )}
-                  </div>
-                )}
 
                 <Button onClick={addComment} className="w-full" disabled={!newComment.trim()}>
                   <Send className="h-4 w-4 mr-2" />
@@ -697,92 +1185,106 @@ export default function InteractiveMap({ onCitySelect, className = "" }: Interac
                 </Button>
               </div>
 
-              {/* Comments list */}
-              <div className="space-y-3 max-h-96 overflow-y-auto">
-                {cityComments[selectedCity.id]?.length > 0 ? (
-                  cityComments[selectedCity.id].map((comment) => (
-                    <div key={comment.id} className="p-3 border rounded-lg bg-white dark:bg-gray-800">
-                      <div className="flex items-start justify-between mb-2">
-                        <div>
-                          <span className="font-medium text-sm">{comment.author}</span>
-                          <span className="text-xs text-gray-500 ml-2">{comment.timestamp.toLocaleDateString()}</span>
-                        </div>
-                        <div className="flex gap-1">
-                          <Button variant="ghost" size="sm" onClick={() => startEditComment(comment)}>
-                            <Edit className="h-3 w-3" />
-                          </Button>
-                          <Button variant="ghost" size="sm" onClick={() => deleteComment(comment.id)}>
-                            <Trash2 className="h-3 w-3" />
-                          </Button>
-                        </div>
-                      </div>
-
-                      {editingComment === comment.id ? (
-                        <div className="space-y-2">
-                          <Textarea
-                            value={editContent}
-                            onChange={(e) => setEditContent(e.target.value)}
-                            className="min-h-[60px]"
-                          />
-                          <div className="flex gap-2">
-                            <Button size="sm" onClick={saveEditComment}>
-                              Sauvegarder
+              {/* Right column: Comments list */}
+              <div className="space-y-4">
+                <h3 className="font-semibold text-lg">Commentaires ({cityComments[selectedCity.id]?.length || 0})</h3>
+                <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2">
+                  {cityComments[selectedCity.id]?.length > 0 ? (
+                    cityComments[selectedCity.id].map((comment) => (
+                      <div key={comment.id} className="p-4 border rounded-lg bg-white dark:bg-gray-800 shadow-sm">
+                        <div className="flex items-start justify-between mb-2">
+                          <div>
+                            <span className="font-medium text-sm">{comment.author}</span>
+                            <span className="text-xs text-gray-500 ml-2">{comment.timestamp.toLocaleDateString()}</span>
+                          </div>
+                          <div className="flex gap-1">
+                            <Button variant="ghost" size="sm" onClick={() => startEditComment(comment)}>
+                              <Edit className="h-3 w-3" />
                             </Button>
-                            <Button variant="outline" size="sm" onClick={() => setEditingComment(null)}>
-                              Annuler
+                            <Button variant="ghost" size="sm" onClick={() => deleteComment(comment.id)}>
+                              <Trash2 className="h-3 w-3" />
                             </Button>
                           </div>
                         </div>
-                      ) : (
-                        <>
-                          <p className="text-sm mb-2">{comment.content}</p>
 
-                          {/* User ratings display */}
-                          {comment.userRatings && (
-                            <div className="space-y-1 mb-2 p-2 bg-gray-50 dark:bg-gray-700 rounded text-xs">
-                              <div className="font-medium">Évaluations de l'utilisateur:</div>
-                              <div className="flex items-center gap-4">
-                                <span>Sécurité: {comment.userRatings.criminalite}/100</span>
-                                <span>Propreté: {comment.userRatings.pollution}/100</span>
-                                <span>Infrastructure: {comment.userRatings.infrastructure}/5</span>
-                              </div>
+                        {editingComment === comment.id ? (
+                          <div className="space-y-2">
+                            <Textarea
+                              value={editContent}
+                              onChange={(e) => setEditContent(e.target.value)}
+                              className="min-h-[60px]"
+                            />
+                            <div className="flex gap-2">
+                              <Button size="sm" onClick={saveEditComment}>
+                                Sauvegarder
+                              </Button>
+                              <Button variant="outline" size="sm" onClick={() => setEditingComment(null)}>
+                                Annuler
+                              </Button>
                             </div>
-                          )}
-
-                          <div className="flex items-center gap-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => likeComment(comment.id)}
-                              className="text-xs"
-                            >
-                              <ThumbsUp className="h-3 w-3 mr-1" />
-                              {comment.likes}
-                            </Button>
                           </div>
-                        </>
-                      )}
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-sm text-gray-500 text-center py-4">
-                    Aucun commentaire pour cette ville. Soyez le premier à partager votre expérience !
-                  </p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        )}
-      </div>
+                        ) : (
+                          <>
+                            <p className="text-sm mb-3">{comment.content}</p>
 
-      {/* Main map */}
-      <div className="lg:col-span-3">
-        <Card className="h-[600px] overflow-hidden">
-          <CardContent className="p-4 h-full">
-            <div ref={mapRef} className="w-full h-full rounded-lg" style={{ minHeight: "500px" }} />
+                            {/* User ratings display */}
+                            {comment.userRatings && (
+                              <div className="space-y-1 mb-3 p-3 bg-gray-50 dark:bg-gray-700 rounded text-xs">
+                                <div className="font-medium mb-2">Évaluations de l'utilisateur:</div>
+                                <div className="grid grid-cols-3 gap-2">
+                                  <div className="text-center">
+                                    <div className="font-semibold text-blue-600">
+                                      {comment.userRatings.criminalite}/100
+                                    </div>
+                                    <div className="text-gray-600">Sécurité</div>
+                                  </div>
+                                  <div className="text-center">
+                                    <div className="font-semibold text-green-600">
+                                      {comment.userRatings.pollution}/100
+                                    </div>
+                                    <div className="text-gray-600">Propreté</div>
+                                  </div>
+                                  <div className="text-center">
+                                    <div className="font-semibold text-yellow-600">
+                                      {comment.userRatings.infrastructure}/5
+                                    </div>
+                                    <div className="text-gray-600">Infrastructure</div>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
+                            <div className="flex items-center gap-2">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => likeComment(comment.id)}
+                                className="text-xs"
+                              >
+                                <ThumbsUp className="h-3 w-3 mr-1" />
+                                {comment.likes}
+                              </Button>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-8 text-gray-500">
+                      <MessageCircle className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                      <p className="text-sm">
+                        Aucun commentaire pour cette ville.
+                        <br />
+                        Soyez le premier à partager votre expérience !
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
-      </div>
+      )}
     </div>
   )
 }

@@ -140,7 +140,6 @@ def init_database():
 # Initialiser la base de données au démarrage
 init_database()
 
-# Système de chatbot
 class ChatbotSystem:
     def __init__(self):
         self.vectorizer = TfidfVectorizer()
@@ -172,8 +171,8 @@ class ChatbotSystem:
             return None
     
     def call_gemini_api(self, question: str) -> str:
-        GEMINI_API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GEMINI_API_KEY}"
         headers = {
+            "Authorization": f"Bearer {GEMINI_API_KEY}",
             "Content-Type": "application/json"
         }
         payload = {
@@ -184,7 +183,7 @@ class ChatbotSystem:
             }]
         }
         try:
-            response = requests.post(GEMINI_API_URL, headers=headers, json=payload, timeout=30)
+            response = requests.post(GEMINI_API_URL, headers=headers, json=payload, timeout=10)
             response.raise_for_status()
             data = response.json()
             if 'candidates' in data and len(data['candidates']) > 0:
@@ -194,6 +193,7 @@ class ChatbotSystem:
             return f"Erreur de communication avec l'IA: {str(e)}"
 
 chatbot = ChatbotSystem()
+
 
 # Système ML pour les indices de risque
 class RiskAnalysisSystem:
