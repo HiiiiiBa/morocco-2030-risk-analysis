@@ -8,28 +8,52 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { MessageSquare, Send, ThumbsUp, Reply } from "lucide-react"
 
 interface Comment {
-  id: number
+  id: string
   author: string
-  content: string
-  timestamp: string
-  likes: number
-  replies?: Comment[]
+  date: string
+  rating: number
+  comment: string
+  avatar?: string
 }
 
 interface CommentSectionProps {
   title?: string
   placeholder?: string
   context?: string
+  cityId?: string
+  onCommentAdded?: () => void
 }
 
 export default function CommentSection({
   title = "Commentaires",
   placeholder = "Partagez votre avis...",
   context = "general",
+  cityId = "casablanca",
+  onCommentAdded,
 }: CommentSectionProps) {
   const [comments, setComments] = useState<Comment[]>([])
   const [newComment, setNewComment] = useState("")
   const [userData, setUserData] = useState<any>(null)
+  const [loading, setLoading] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+
+  // Fonction pour charger les commentaires depuis l'API
+  const loadComments = async () => {
+    if (!cityId) return
+    
+    setLoading(true)
+    try {
+      const response = await fetch(`http://localhost:8000/cities/${cityId}/comments`)
+      if (response.ok) {
+        const data = await response.json()
+        setComments(data.comments || [])
+      }
+    } catch (error) {
+      console.error("Erreur lors du chargement des commentaires:", error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
     // Load user data from localStorage
@@ -38,54 +62,62 @@ export default function CommentSection({
       setUserData(JSON.parse(user))
     }
 
-    // Load mock comments based on context
-    const mockComments: Comment[] = [
-      {
-        id: 1,
-        author: "Marie Dubois",
-        content: "Excellente analyse des risques. Les données sur Casablanca sont particulièrement préoccupantes.",
-        timestamp: "Il y a 2 heures",
-        likes: 5,
-        replies: [
-          {
-            id: 2,
-            author: "Ahmed Benali",
-            content: "Je suis d'accord, il faudrait renforcer la surveillance dans cette zone.",
-            timestamp: "Il y a 1 heure",
-            likes: 2,
-          },
-        ],
-      },
-      {
-        id: 3,
-        author: "Jean Martin",
-        content: "Les infrastructures de Rabat semblent bien développées. Un bon exemple à suivre.",
-        timestamp: "Il y a 4 heures",
-        likes: 8,
-      },
-    ]
-    setComments(mockComments)
-  }, [context])
+    // Load comments from API
+    loadComments()
+  }, [cityId])
 
-  const handleSubmitComment = () => {
-    if (!newComment.trim() || !userData) return
+  const handleSubmitComment = async () => {
+    if (!newComment.trim() || !userData || !cityId) return
 
-    const comment: Comment = {
-      id: Date.now(),
-      author: `${userData.first_name} ${userData.last_name}`,
-      content: newComment,
-      timestamp: "À l'instant",
-      likes: 0,
+    setSubmitting(true)
+    try {
+      const token = localStorage.getItem("authToken")
+      if (!token) {
+        alert("Vous devez être connecté pour poster un commentaire")
+        return
+      }
+
+      // Créer un objet de review pour l'API
+      const reviewData = {
+        city_id: cityId,
+        criminalite: 3, // Valeur par défaut, vous pouvez ajouter des sliders pour ces valeurs
+        pollution: 3,
+        infrastructure: 3,
+        commentaire: newComment
+      }
+
+      const response = await fetch(`http://localhost:8000/cities/${cityId}/comments`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(reviewData)
+      })
+
+      if (response.ok) {
+        console.log("Commentaire ajouté avec succès, rafraîchissement des données...")
+        // Recharger les commentaires après ajout
+        await loadComments()
+        setNewComment("")
+        // Attendre un peu pour que le backend recalcule les scores
+        setTimeout(() => {
+          console.log("Rafraîchissement des données de la ville...")
+          // Déclencher le rafraîchissement des données de la ville
+          if (onCommentAdded) {
+            onCommentAdded()
+          }
+        }, 800) // Délai de 800ms pour laisser le temps au backend de recalculer
+      } else {
+        const errorData = await response.json()
+        alert(`Erreur: ${errorData.detail || "Impossible d'ajouter le commentaire"}`)
+      }
+    } catch (error) {
+      console.error("Erreur lors de l'ajout du commentaire:", error)
+      alert("Erreur lors de l'ajout du commentaire")
+    } finally {
+      setSubmitting(false)
     }
-
-    setComments([comment, ...comments])
-    setNewComment("")
-  }
-
-  const handleLike = (commentId: number) => {
-    setComments(
-      comments.map((comment) => (comment.id === commentId ? { ...comment, likes: comment.likes + 1 } : comment)),
-    )
   }
 
   return (
@@ -119,11 +151,11 @@ export default function CommentSection({
             <div className="flex justify-end">
               <Button
                 onClick={handleSubmitComment}
-                disabled={!newComment.trim()}
+                disabled={!newComment.trim() || submitting}
                 className="bg-red-600 hover:bg-red-700"
               >
                 <Send className="h-4 w-4 mr-2" />
-                Publier
+                {submitting ? "Publication..." : "Publier"}
               </Button>
             </div>
           </div>
@@ -131,79 +163,43 @@ export default function CommentSection({
 
         {/* Comments list */}
         <div className="space-y-4">
-          {comments.map((comment) => (
-            <div key={comment.id} className="space-y-3">
-              <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <Avatar className="w-8 h-8">
-                  <AvatarFallback className="bg-blue-600 text-white text-sm">
-                    {comment.author
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1 space-y-2">
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium text-sm">{comment.author}</span>
-                    <span className="text-xs text-gray-500">{comment.timestamp}</span>
-                  </div>
-                  <p className="text-sm text-gray-700 dark:text-gray-300">{comment.content}</p>
-                  <div className="flex items-center gap-4">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleLike(comment.id)}
-                      className="text-xs h-auto p-1"
-                    >
-                      <ThumbsUp className="h-3 w-3 mr-1" />
-                      {comment.likes}
-                    </Button>
-                    <Button variant="ghost" size="sm" className="text-xs h-auto p-1">
-                      <Reply className="h-3 w-3 mr-1" />
-                      Répondre
-                    </Button>
+          {loading ? (
+            <div className="text-center py-4">
+              <p>Chargement des commentaires...</p>
+            </div>
+          ) : (
+            comments.map((comment) => (
+              <div key={comment.id} className="space-y-3">
+                <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                  <Avatar className="w-8 h-8">
+                    <AvatarFallback className="bg-blue-600 text-white text-sm">
+                      {comment.avatar || comment.author
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium text-sm">{comment.author}</span>
+                      <span className="text-xs text-gray-500">{comment.date}</span>
+                      <div className="flex items-center gap-1">
+                        {[...Array(5)].map((_, i) => (
+                          <span key={i} className={`text-xs ${i < comment.rating ? 'text-yellow-400' : 'text-gray-300'}`}>
+                            ★
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    <p className="text-sm text-gray-700 dark:text-gray-300">{comment.comment}</p>
                   </div>
                 </div>
               </div>
-
-              {/* Replies */}
-              {comment.replies && comment.replies.length > 0 && (
-                <div className="ml-8 space-y-3">
-                  {comment.replies.map((reply) => (
-                    <div key={reply.id} className="flex items-start gap-3 p-3 bg-gray-100 dark:bg-gray-700 rounded-lg">
-                      <Avatar className="w-6 h-6">
-                        <AvatarFallback className="bg-green-600 text-white text-xs">
-                          {reply.author
-                            .split(" ")
-                            .map((n) => n[0])
-                            .join("")}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 space-y-1">
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium text-xs">{reply.author}</span>
-                          <span className="text-xs text-gray-500">{reply.timestamp}</span>
-                        </div>
-                        <p className="text-xs text-gray-700 dark:text-gray-300">{reply.content}</p>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleLike(reply.id)}
-                          className="text-xs h-auto p-1"
-                        >
-                          <ThumbsUp className="h-3 w-3 mr-1" />
-                          {reply.likes}
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
+            ))
+          )}
         </div>
 
-        {comments.length === 0 && (
+        {!loading && comments.length === 0 && (
           <div className="text-center py-8 text-gray-500">
             <MessageSquare className="h-12 w-12 mx-auto mb-3 opacity-50" />
             <p>Aucun commentaire pour le moment.</p>

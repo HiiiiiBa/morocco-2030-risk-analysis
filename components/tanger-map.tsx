@@ -18,7 +18,7 @@ import {
   ThumbsUp 
 } from "lucide-react"
 
-interface RabatZone {
+interface TangerZone {
   id: string
   name: string
   lat: number
@@ -28,6 +28,49 @@ interface RabatZone {
   infrastructure: number
   riskLevel: string
 }
+
+const tangerZones: TangerZone[] = [
+  {
+    id: "bni-makada",
+    name: "Bni Makada",
+    lat: 35.7503,
+    lng: -5.8169,
+    criminalite: 50.34,
+    pollution: 55,
+    infrastructure: 3.5,
+    riskLevel: "Modéré"
+  },
+  {
+    id: "charf-mghogha",
+    name: "Charf-Mghogha",
+    lat: 35.7641,
+    lng: -5.7972,
+    criminalite: 29.49,
+    pollution: 55,
+    infrastructure: 3.5,
+    riskLevel: "Faible"
+  },
+  {
+    id: "charf-souani",
+    name: "Charf-Souani",
+    lat: 35.7647,
+    lng: -5.8134,
+    criminalite: 25.40,
+    pollution: 55,
+    infrastructure: 3.6,
+    riskLevel: "Faible"
+  },
+  {
+    id: "tanger-medina",
+    name: "Tanger-Médina",
+    lat: 35.7535,
+    lng: -5.8509,
+    criminalite: 20.49,
+    pollution: 55,
+    infrastructure: 3.9,
+    riskLevel: "Faible"
+  }
+]
 
 interface ZoneComment {
   id: string
@@ -48,79 +91,6 @@ interface UserRating {
   pollution: number
   infrastructure: number
 }
-
-const rabatZones: RabatZone[] = [
-  {
-    id: "agdal-riyad",
-    name: "Agdal-Riyad",
-    lat: 33.9866,
-    lng: -6.8514,
-    criminalite: 15.84,
-    pollution: 55,
-    infrastructure: 4.0,
-    riskLevel: "Faible"
-  },
-  {
-    id: "el-youssoufia",
-    name: "El Youssoufia",
-    lat: 33.9975,
-    lng: -6.8147,
-    criminalite: 47.97,
-    pollution: 55,
-    infrastructure: 3.9,
-    riskLevel: "Modéré"
-  },
-  {
-    id: "hassan",
-    name: "Hassan",
-    lat: 34.0220,
-    lng: -6.8380,
-    criminalite: 15.84,
-    pollution: 50,
-    infrastructure: 4.6,
-    riskLevel: "Faible"
-  },
-  {
-    id: "souissi",
-    name: "Souissi",
-    lat: 33.9799,
-    lng: -6.8405,
-    criminalite: 10.42,
-    pollution: 50,
-    infrastructure: 4.6,
-    riskLevel: "Faible"
-  },
-  {
-    id: "yacoub-el-mansour",
-    name: "Yacoub El Mansour",
-    lat: 33.9834,
-    lng: -6.8873,
-    criminalite: 42.98,
-    pollution: 55,
-    infrastructure: 4.1,
-    riskLevel: "Modéré"
-  },
-  {
-    id: "temara",
-    name: "Temara",
-    lat: 33.9213,
-    lng: -6.8999,
-    criminalite: 44.34,
-    pollution: 60,
-    infrastructure: 3.9,
-    riskLevel: "Modéré"
-  },
-  {
-    id: "touarga",
-    name: "Touarga",
-    lat: 34.0032,
-    lng: -6.8384,
-    criminalite: 10.0,
-    pollution: 55,
-    infrastructure: 3.5,
-    riskLevel: "Faible"
-  }
-]
 
 const getRiskColor = (riskLevel: string): string => {
   switch (riskLevel) {
@@ -143,20 +113,15 @@ const getPollutionColor = (indice: number): string => {
   return "#ef4444"
 }
 
-export default function RabatMap() {
+export default function TangerMap() {
   const [isClient, setIsClient] = useState(false)
-  const [selectedZone, setSelectedZone] = useState<RabatZone | null>(null)
+  const [selectedZone, setSelectedZone] = useState<TangerZone | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [searchError, setSearchError] = useState<string | null>(null)
   const [zoneComments, setZoneComments] = useState<{ [zoneId: string]: ZoneComment[] }>({})
   const [newComment, setNewComment] = useState("")
   const [editingComment, setEditingComment] = useState<string | null>(null)
   const [editContent, setEditContent] = useState("")
-  const [editRating, setEditRating] = useState<UserRating>({
-    criminalite: 0,
-    pollution: 0,
-    infrastructure: 0,
-  })
   const [userData, setUserData] = useState<any>(null)
   const [userRating, setUserRating] = useState<UserRating>({
     criminalite: 0,
@@ -185,7 +150,7 @@ export default function RabatMap() {
       return
     }
 
-    const foundZone = rabatZones.find((zone) => 
+    const foundZone = tangerZones.find((zone) => 
       zone.name.toLowerCase().includes(searchTerm.toLowerCase())
     )
 
@@ -205,7 +170,7 @@ export default function RabatMap() {
   // Fonction pour charger les commentaires depuis l'API
   const loadZoneComments = async (zoneId: string) => {
     try {
-      const response = await fetch(`http://localhost:8000/cities/rabat/districts/${zoneId}/comments`)
+      const response = await fetch(`http://localhost:8000/cities/tanger/districts/${zoneId}/comments`)
       if (response.ok) {
         const data = await response.json()
         const comments = data.comments || []
@@ -226,7 +191,7 @@ export default function RabatMap() {
         }))
         
         setZoneComments(prev => ({
-      ...prev,
+          ...prev,
           [zoneId]: formattedComments
         }))
       }
@@ -247,7 +212,7 @@ export default function RabatMap() {
 
       // Créer un objet de review pour l'API
       const reviewData = {
-        city_id: "rabat",
+        city_id: "tanger",
         district_id: selectedZone.id,
         criminalite: userRating.criminalite || 3,
         pollution: userRating.pollution || 3,
@@ -255,7 +220,7 @@ export default function RabatMap() {
         commentaire: newComment
       }
 
-      const response = await fetch(`http://localhost:8000/cities/rabat/districts/${selectedZone.id}/comments`, {
+      const response = await fetch(`http://localhost:8000/cities/tanger/districts/${selectedZone.id}/comments`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -267,8 +232,8 @@ export default function RabatMap() {
       if (response.ok) {
         // Recharger les commentaires après ajout
         await loadZoneComments(selectedZone.id)
-    setNewComment("")
-    setUserRating({ criminalite: 0, pollution: 0, infrastructure: 0 })
+        setNewComment("")
+        setUserRating({ criminalite: 0, pollution: 0, infrastructure: 0 })
       } else {
         const errorData = await response.json()
         alert(`Erreur: ${errorData.detail || "Impossible d'ajouter le commentaire"}`)
@@ -279,99 +244,28 @@ export default function RabatMap() {
     }
   }
 
-  const deleteComment = async (commentId: string) => {
+  const deleteComment = (commentId: string) => {
     if (!selectedZone) return
-    
-    if (!confirm("Êtes-vous sûr de vouloir supprimer ce commentaire ?")) {
-      return
-    }
-
-    try {
-      const token = localStorage.getItem("authToken")
-      if (!token) {
-        alert("Vous devez être connecté pour supprimer un commentaire")
-        return
-      }
-
-      const response = await fetch(`http://localhost:8000/cities/rabat/districts/${selectedZone.id}/comments/${commentId}`, {
-        method: "DELETE",
-        headers: {
-          "Authorization": `Bearer ${token}`
-        }
-      })
-
-      if (response.ok) {
-        // Recharger les commentaires après suppression
-        await loadZoneComments(selectedZone.id)
-      } else {
-        const errorData = await response.json()
-        alert(`Erreur: ${errorData.detail || "Impossible de supprimer le commentaire"}`)
-      }
-    } catch (error) {
-      console.error("Erreur lors de la suppression du commentaire:", error)
-      alert("Erreur lors de la suppression du commentaire")
-    }
+    setZoneComments((prev) => ({
+      ...prev,
+      [selectedZone.id]: prev[selectedZone.id]?.filter((c) => c.id !== commentId) || [],
+    }))
   }
 
   const startEditComment = (comment: ZoneComment) => {
     setEditingComment(comment.id)
     setEditContent(comment.content)
-    // Convertir de 1-5 vers 0-100 pour l'édition
-    const ratings = comment.userRatings || { criminalite: 0, pollution: 0, infrastructure: 0 }
-    setEditRating({
-      criminalite: ratings.criminalite ? (ratings.criminalite - 1) * 25 : 0, // 1-5 -> 0-100
-      pollution: ratings.pollution ? (ratings.pollution - 1) * 25 : 0, // 1-5 -> 0-100
-      infrastructure: ratings.infrastructure ? (ratings.infrastructure - 1) * 25 : 0 // 1-5 -> 0-100
-    })
   }
 
-  const saveEditComment = async () => {
+  const saveEditComment = () => {
     if (!selectedZone || !editingComment) return
-
-    try {
-      const token = localStorage.getItem("authToken")
-      if (!token) {
-        alert("Vous devez être connecté pour modifier un commentaire")
-        return
-      }
-
-      // Convertir de 0-100 vers 1-5 pour l'API
-      const criminaliteScore = editRating.criminalite > 0 ? Math.max(1, Math.min(5, Math.ceil(editRating.criminalite / 20))) : 3
-      const pollutionScore = editRating.pollution > 0 ? Math.max(1, Math.min(5, Math.ceil(editRating.pollution / 20))) : 3
-      const infrastructureScore = editRating.infrastructure > 0 ? Math.max(1, Math.min(5, Math.ceil(editRating.infrastructure / 20))) : 3
-
-      const reviewData = {
-        city_id: "rabat",
-        district_id: selectedZone.id,
-        criminalite: criminaliteScore,
-        pollution: pollutionScore,
-        infrastructure: infrastructureScore,
-        commentaire: editContent
-      }
-
-      const response = await fetch(`http://localhost:8000/cities/rabat/districts/${selectedZone.id}/comments/${editingComment}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify(reviewData)
-      })
-
-      if (response.ok) {
-        // Recharger les commentaires après modification
-        await loadZoneComments(selectedZone.id)
+    setZoneComments((prev) => ({
+      ...prev,
+      [selectedZone.id]:
+        prev[selectedZone.id]?.map((c) => (c.id === editingComment ? { ...c, content: editContent } : c)) || [],
+    }))
     setEditingComment(null)
     setEditContent("")
-        setEditRating({ criminalite: 0, pollution: 0, infrastructure: 0 })
-      } else {
-        const errorData = await response.json()
-        alert(`Erreur: ${errorData.detail || "Impossible de modifier le commentaire"}`)
-      }
-    } catch (error) {
-      console.error("Erreur lors de la modification du commentaire:", error)
-      alert("Erreur lors de la modification du commentaire")
-    }
   }
 
   const likeComment = (commentId: string) => {
@@ -382,7 +276,6 @@ export default function RabatMap() {
         prev[selectedZone.id]?.map((c) => (c.id === commentId ? { ...c, likes: c.likes + 1 } : c)) || [],
     }))
   }
-
 
   const renderStarRating = (rating: number, onRate: (rating: number) => void, label: string) => (
     <div className="flex items-center gap-2">
@@ -453,7 +346,7 @@ export default function RabatMap() {
     }
 
     const L = (window as any).L
-    console.log("Starting to add markers for", rabatZones.length, "zones")
+    console.log("Starting to add markers for", tangerZones.length, "zones")
 
     // Nettoyer les marqueurs existants
     mapInstanceRef.current.eachLayer((layer: any) => {
@@ -462,7 +355,7 @@ export default function RabatMap() {
       }
     })
 
-    rabatZones.forEach((zone) => {
+    tangerZones.forEach((zone) => {
       const color = getRiskColor(zone.riskLevel)
 
       const customIcon = L.divIcon({
@@ -527,7 +420,7 @@ export default function RabatMap() {
     })
 
     markersAddedRef.current = true
-    console.log("Successfully added", rabatZones.length, "markers to the map")
+    console.log("Successfully added", tangerZones.length, "markers to the map")
   }, [])
 
   useEffect(() => {
@@ -572,8 +465,8 @@ export default function RabatMap() {
         })
 
         const mapInstance = L.map(mapRef.current, {
-          center: [33.9866, -6.8514], // Centré sur Agdal-Riyad
-          zoom: 12,
+          center: [35.7535, -5.8509], // Centré sur Tanger-Médina
+          zoom: 13,
           zoomControl: true,
           scrollWheelZoom: true,
           doubleClickZoom: true,
@@ -608,7 +501,7 @@ export default function RabatMap() {
       <div className="w-full h-96 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-          <p className="text-gray-600 dark:text-gray-400">Chargement de la carte de Rabat...</p>
+          <p className="text-gray-600 dark:text-gray-400">Chargement de la carte de Tanger...</p>
         </div>
       </div>
     )
@@ -756,7 +649,6 @@ export default function RabatMap() {
         </div>
       </div>
 
-
       {/* Section Commentaires et Évaluations */}
       {selectedZone && (
         <Card className="w-full">
@@ -830,111 +722,17 @@ export default function RabatMap() {
                         </div>
 
                         {editingComment === comment.id ? (
-                          <div className="space-y-4">
-                            <div>
-                              <label className="block text-sm font-medium mb-2">Commentaire</label>
+                          <div className="space-y-2">
                             <Textarea
                               value={editContent}
                               onChange={(e) => setEditContent(e.target.value)}
-                                className="min-h-[80px]"
-                                placeholder="Modifiez votre commentaire..."
-                              />
-                            </div>
-                            
-                            <div className="space-y-4 p-4 border rounded-lg bg-gray-50 dark:bg-gray-700">
-                              <h4 className="font-medium">Modifier les évaluations</h4>
-                              
-                              {/* Criminalité - Slider 0-100 */}
-                              <div>
-                                <div className="flex items-center justify-between mb-2">
-                                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                    Criminalité
-                                  </label>
-                                  <span className="text-xs text-gray-500">
-                                    {editRating.criminalite}/100
-                                  </span>
-                                </div>
-                                <div className="flex items-center justify-between text-xs mb-1">
-                                  <span className="text-green-600 font-medium">Sûr (0)</span>
-                                  <span className="text-red-600 font-medium">Dangereux (100)</span>
-                                </div>
-                                <input
-                                  type="range"
-                                  min="0"
-                                  max="100"
-                                  value={editRating.criminalite}
-                                  onChange={(e) => setEditRating(prev => ({ ...prev, criminalite: parseInt(e.target.value) }))}
-                                  className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
-                                  style={{
-                                    background: `linear-gradient(to right, #10b981 0%, #fbbf24 50%, #ef4444 100%)`
-                                  }}
-                                />
-                              </div>
-
-                              {/* Pollution - Slider 0-100 */}
-                              <div>
-                                <div className="flex items-center justify-between mb-2">
-                                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                    Pollution
-                                  </label>
-                                  <span className="text-xs text-gray-500">
-                                    {editRating.pollution}/100
-                                  </span>
-                                </div>
-                                <div className="flex items-center justify-between text-xs mb-1">
-                                  <span className="text-green-600 font-medium">Propre (0)</span>
-                                  <span className="text-red-600 font-medium">Pollué (100)</span>
-                                </div>
-                                <input
-                                  type="range"
-                                  min="0"
-                                  max="100"
-                                  value={editRating.pollution}
-                                  onChange={(e) => setEditRating(prev => ({ ...prev, pollution: parseInt(e.target.value) }))}
-                                  className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
-                                  style={{
-                                    background: `linear-gradient(to right, #10b981 0%, #fbbf24 50%, #ef4444 100%)`
-                                  }}
-                                />
-                              </div>
-
-                              {/* Infrastructure - Slider 0-100 */}
-                              <div>
-                                <div className="flex items-center justify-between mb-2">
-                                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                    Infrastructure
-                                  </label>
-                                  <span className="text-xs text-gray-500">
-                                    {editRating.infrastructure}/100
-                                  </span>
-                                </div>
-                                <div className="flex items-center justify-between text-xs mb-1">
-                                  <span className="text-red-600 font-medium">Mauvaise (0)</span>
-                                  <span className="text-green-600 font-medium">Excellente (100)</span>
-                                </div>
-                                <input
-                                  type="range"
-                                  min="0"
-                                  max="100"
-                                  value={editRating.infrastructure}
-                                  onChange={(e) => setEditRating(prev => ({ ...prev, infrastructure: parseInt(e.target.value) }))}
-                                  className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
-                                  style={{
-                                    background: `linear-gradient(to right, #ef4444 0%, #fbbf24 50%, #10b981 100%)`
-                                  }}
-                                />
-                              </div>
-                            </div>
-                            
+                              className="min-h-[60px]"
+                            />
                             <div className="flex gap-2">
-                              <Button size="sm" onClick={saveEditComment} className="bg-green-600 hover:bg-green-700">
+                              <Button size="sm" onClick={saveEditComment}>
                                 Sauvegarder
                               </Button>
-                              <Button variant="outline" size="sm" onClick={() => {
-                                setEditingComment(null)
-                                setEditContent("")
-                                setEditRating({ criminalite: 0, pollution: 0, infrastructure: 0 }) // 0-100 pour l'édition
-                              }}>
+                              <Button variant="outline" size="sm" onClick={() => setEditingComment(null)}>
                                 Annuler
                               </Button>
                             </div>

@@ -176,10 +176,9 @@ export default function CityTransportContent({ citySlug }: CityTransportContentP
               )}
               {city.slug === "rabat" && (
                 <>
-                  <p>• Réseau Al Bidaoui</p>
                   <p>• 20+ lignes principales</p>
-              <p>• Prix : 3-5 MAD</p>
-              <p>• Horaires : 5h30-23h30</p>
+              <p>• Prix : 5-10 MAD</p>
+              <p>• Horaires : 6h30-22h30</p>
                 </>
               )}
               {city.slug === "fes" && (
@@ -547,7 +546,6 @@ export default function CityTransportContent({ citySlug }: CityTransportContentP
                   </p>
                   <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="font-medium text-green-800 dark:text-green-200">Réseau Al Bidaoui</span>
                       <Badge variant="outline" className="text-green-600">20+ lignes</Badge>
             </div>
                     <div className="text-sm text-green-700 dark:text-green-300">

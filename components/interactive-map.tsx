@@ -124,11 +124,14 @@ export default function InteractiveMap({ onCitySelect, className }: InteractiveM
   const [newComment, setNewComment] = useState("")
   const [editingComment, setEditingComment] = useState<string | null>(null)
   const [editContent, setEditContent] = useState("")
+  const [userData, setUserData] = useState<any>(null)
   const [userRating, setUserRating] = useState<UserRating>({
     criminalite: 0,
     pollution: 0,
     infrastructure: 0,
   })
+  const [loadingComments, setLoadingComments] = useState(false)
+  const [submittingComment, setSubmittingComment] = useState(false)
 
   const mapRef = useRef<HTMLDivElement>(null)
   const mapInstanceRef = useRef<any>(null)
@@ -141,8 +144,8 @@ export default function InteractiveMap({ onCitySelect, className }: InteractiveM
         name: "Rabat",
         lat: 34.021845,
         lng: -6.840893,
-        Indice_Criminalite: 30.12,
-        Indice_Pollution: 55,
+        Indice_Criminalite: 39,
+        Indice_Pollution: 44,
         Score_Infrastructures: 4.5,
         riskLevel: "Faible",
       },
@@ -674,7 +677,7 @@ export default function InteractiveMap({ onCitySelect, className }: InteractiveM
             justify-content: center;
             position: relative;
             cursor: pointer;
-            transition: all 0.2s ease;
+            pointer-events: auto;
           ">
             <div style="
               width: 6px;
@@ -682,6 +685,7 @@ export default function InteractiveMap({ onCitySelect, className }: InteractiveM
               background-color: white;
               border-radius: 50%;
               opacity: 0.95;
+              pointer-events: none;
             "></div>
           </div>`,
           iconSize: [26, 26],
@@ -690,13 +694,18 @@ export default function InteractiveMap({ onCitySelect, className }: InteractiveM
 
         const cityData = { ...city }
 
-        const marker = L.marker([cityData.lat, cityData.lng], { icon: customIcon })
+        const marker = L.marker([cityData.lat, cityData.lng], { 
+          icon: customIcon,
+          bubblingMouseEvents: false
+        })
           .addTo(mapInstanceRef.current)
-          .on("click", () => {
+          .on("click", (e: any) => {
             console.log("[v0] Marker clicked for city:", cityData.name)
+            e.originalEvent.stopPropagation()
             const cityWithGlobal = { ...cityData, indice_global: calculerIndiceGlobal(cityData) }
             setSelectedCity(cityWithGlobal)
             fetchWeatherData(cityData)
+            loadCityComments(cityData.id)
             onCitySelect?.(cityWithGlobal)
           })
 
@@ -727,6 +736,14 @@ export default function InteractiveMap({ onCitySelect, className }: InteractiveM
   }, [cities, onCitySelect])
 
   useEffect(() => {
+    // Load user data from localStorage
+    const user = localStorage.getItem("user")
+    if (user) {
+      setUserData(JSON.parse(user))
+    }
+  }, [])
+
+  useEffect(() => {
     if (typeof window !== "undefined" && mapRef.current && !mapInstanceRef.current) {
       console.log("[v0] Initializing map...")
 
@@ -737,12 +754,15 @@ export default function InteractiveMap({ onCitySelect, className }: InteractiveM
 
       const style = document.createElement("style")
       style.textContent = `
-        .custom-marker:hover {
-          transform: scale(1.2) !important;
-          z-index: 1000 !important;
-        }
         .custom-marker {
-          transition: all 0.2s ease !important;
+          pointer-events: auto !important;
+          cursor: pointer !important;
+        }
+        .custom-marker * {
+          pointer-events: none !important;
+        }
+        .leaflet-marker-icon {
+          cursor: pointer !important;
         }
         .leaflet-popup-content-wrapper {
           border-radius: 8px !important;
@@ -827,6 +847,7 @@ export default function InteractiveMap({ onCitySelect, className }: InteractiveM
       const cityWithGlobal = { ...foundCity, indice_global: calculerIndiceGlobal(foundCity) }
       setSelectedCity(cityWithGlobal)
       fetchWeatherData(foundCity)
+      loadCityComments(foundCity.id)
       onCitySelect?.(cityWithGlobal)
       setSearchError(null)
 
@@ -838,26 +859,89 @@ export default function InteractiveMap({ onCitySelect, className }: InteractiveM
     }
   }
 
-  const addComment = () => {
-    if (!selectedCity || !newComment.trim()) return
-
-    const comment: CityComment = {
-      id: Date.now().toString(),
-      cityId: selectedCity.id,
-      author: "Utilisateur",
-      content: newComment,
-      timestamp: new Date(),
-      likes: 0,
-      userRatings: { ...userRating },
+  // Fonction pour charger les commentaires depuis l'API
+  // Fonction pour charger les commentaires depuis l'API
+const loadCityComments = async (cityId: string) => {
+  if (!cityId) return
+  
+  setLoadingComments(true)
+  try {
+    const response = await fetch(`http://localhost:8000/cities/${cityId}/comments`)
+    if (response.ok) {
+      const data = await response.json()
+      const comments = data.comments || []
+      
+      // Convertir les commentaires de l'API au format local AVEC LES VALEURS RÉELLES
+      const formattedComments: CityComment[] = comments.map((comment: any) => ({
+        id: comment.id,
+        cityId: cityId,
+        author: comment.author,
+        content: comment.comment,
+        timestamp: new Date(comment.date),
+        likes: 0,
+        userRatings: {
+          criminalite: comment.criminalite || 0, // Utilisez la valeur réelle
+          pollution: comment.pollution || 0,     // Utilisez la valeur réelle
+          infrastructure: comment.infrastructure || 0 // Utilisez la valeur réelle
+        }
+      }))
+      
+      setCityComments(prev => ({
+        ...prev,
+        [cityId]: formattedComments
+      }))
     }
+  } catch (error) {
+    console.error("Erreur lors du chargement des commentaires:", error)
+  } finally {
+    setLoadingComments(false)
+  }
+}
 
-    setCityComments((prev) => ({
-      ...prev,
-      [selectedCity.id]: [...(prev[selectedCity.id] || []), comment],
-    }))
+  const addComment = async () => {
+    if (!selectedCity || !newComment.trim() || !userData) return
 
-    setNewComment("")
-    setUserRating({ criminalite: 0, pollution: 0, infrastructure: 0 })
+    setSubmittingComment(true)
+    try {
+      const token = localStorage.getItem("authToken")
+      if (!token) {
+        alert("Vous devez être connecté pour poster un commentaire")
+        return
+      }
+
+      // Créer un objet de review pour l'API
+      const reviewData = {
+        city_id: selectedCity.id,
+        criminalite: userRating.criminalite || 3,
+        pollution: userRating.pollution || 3,
+        infrastructure: userRating.infrastructure || 3,
+        commentaire: newComment
+      }
+
+      const response = await fetch(`http://localhost:8000/cities/${selectedCity.id}/comments`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(reviewData)
+      })
+
+      if (response.ok) {
+        // Recharger les commentaires après ajout
+        await loadCityComments(selectedCity.id)
+        setNewComment("")
+        setUserRating({ criminalite: 0, pollution: 0, infrastructure: 0 })
+      } else {
+        const errorData = await response.json()
+        alert(`Erreur: ${errorData.detail || "Impossible d'ajouter le commentaire"}`)
+      }
+    } catch (error) {
+      console.error("Erreur lors de l'ajout du commentaire:", error)
+      alert("Erreur lors de l'ajout du commentaire")
+    } finally {
+      setSubmittingComment(false)
+    }
   }
 
   const deleteComment = (commentId: string) => {
@@ -908,30 +992,46 @@ export default function InteractiveMap({ onCitySelect, className }: InteractiveM
     </div>
   )
 
-  const renderSliderRating = (rating: number, onRate: (rating: number) => void, label: string) => (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <span className="text-sm font-medium">{label}:</span>
-        <span className="text-sm font-bold text-blue-600">{rating}/100</span>
+  const renderSliderRating = (rating: number, onRate: (rating: number) => void, label: string) => {
+    const isRiskFactor = label === "Criminalité" || label === "Pollution"
+    
+    return (
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-medium">{label}:</span>
+          <span className="text-sm font-bold text-blue-600">{rating}/100</span>
+        </div>
+        <input
+          type="range"
+          min="0"
+          max="100"
+          value={rating}
+          onChange={(e) => onRate(Number.parseInt(e.target.value))}
+          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+          style={{
+            background: isRiskFactor 
+              ? `linear-gradient(to right, #10b981 0%, #f59e0b 50%, #ef4444 100%)`
+              : `linear-gradient(to right, #ef4444 0%, #f59e0b 50%, #10b981 100%)`,
+          }}
+        />
+        <div className="flex justify-between text-xs text-gray-500">
+          {isRiskFactor ? (
+            <>
+              <span>Très faible</span>
+              <span>Moyen</span>
+              <span>Très élevé</span>
+            </>
+          ) : (
+            <>
+              <span>Très mauvais</span>
+              <span>Moyen</span>
+              <span>Excellent</span>
+            </>
+          )}
+        </div>
       </div>
-      <input
-        type="range"
-        min="0"
-        max="100"
-        value={rating}
-        onChange={(e) => onRate(Number.parseInt(e.target.value))}
-        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
-        style={{
-          background: `linear-gradient(to right, #ef4444 0%, #f59e0b 50%, #10b981 100%)`,
-        }}
-      />
-      <div className="flex justify-between text-xs text-gray-500">
-        <span>Très mauvais</span>
-        <span>Moyen</span>
-        <span>Excellent</span>
-      </div>
-    </div>
-  )
+    )
+  }
 
   return (
     <div className={`space-y-2 ${className}`}>
@@ -1165,12 +1265,12 @@ export default function InteractiveMap({ onCitySelect, className }: InteractiveM
                   {renderSliderRating(
                     userRating.criminalite,
                     (rating) => setUserRating((prev) => ({ ...prev, criminalite: rating })),
-                    "Sécurité",
+                    "Criminalité",
                   )}
                   {renderSliderRating(
                     userRating.pollution,
                     (rating) => setUserRating((prev) => ({ ...prev, pollution: rating })),
-                    "Propreté",
+                    "Pollution",
                   )}
                   {renderStarRating(
                     userRating.infrastructure,
@@ -1179,9 +1279,13 @@ export default function InteractiveMap({ onCitySelect, className }: InteractiveM
                   )}
                 </div>
 
-                <Button onClick={addComment} className="w-full" disabled={!newComment.trim()}>
+                <Button 
+                  onClick={addComment} 
+                  className="w-full" 
+                  disabled={!newComment.trim() || submittingComment}
+                >
                   <Send className="h-4 w-4 mr-2" />
-                  Publier le commentaire
+                  {submittingComment ? "Publication..." : "Publier le commentaire"}
                 </Button>
               </div>
 
@@ -1189,7 +1293,11 @@ export default function InteractiveMap({ onCitySelect, className }: InteractiveM
               <div className="space-y-4">
                 <h3 className="font-semibold text-lg">Commentaires ({cityComments[selectedCity.id]?.length || 0})</h3>
                 <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2">
-                  {cityComments[selectedCity.id]?.length > 0 ? (
+                  {loadingComments ? (
+                    <div className="text-center py-4">
+                      <p>Chargement des commentaires...</p>
+                    </div>
+                  ) : cityComments[selectedCity.id]?.length > 0 ? (
                     cityComments[selectedCity.id].map((comment) => (
                       <div key={comment.id} className="p-4 border rounded-lg bg-white dark:bg-gray-800 shadow-sm">
                         <div className="flex items-start justify-between mb-2">
@@ -1236,13 +1344,13 @@ export default function InteractiveMap({ onCitySelect, className }: InteractiveM
                                     <div className="font-semibold text-blue-600">
                                       {comment.userRatings.criminalite}/100
                                     </div>
-                                    <div className="text-gray-600">Sécurité</div>
+                                    <div className="text-gray-600">Criminalité</div>
                                   </div>
                                   <div className="text-center">
                                     <div className="font-semibold text-green-600">
                                       {comment.userRatings.pollution}/100
                                     </div>
-                                    <div className="text-gray-600">Propreté</div>
+                                    <div className="text-gray-600">Pollution</div>
                                   </div>
                                   <div className="text-center">
                                     <div className="font-semibold text-yellow-600">

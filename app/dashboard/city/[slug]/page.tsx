@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -58,9 +58,9 @@ const moroccanCities: City[] = [
     stadium: "Stade du Prince Moulay-Abdallah",
     capacity: "68 000",
     risk: "Faible",
-    criminalite: 25,
-    pollution: 35,
-    infrastructure: 4,
+    criminalite: 30.12,
+    pollution: 55,
+    infrastructure: 4.5,
     description:
       "Capitale du Royaume, Rabat combine patrimoine historique et modernité pour accueillir les matchs de la Coupe du Monde.",
   },
@@ -96,9 +96,9 @@ const moroccanCities: City[] = [
     stadium: "Stade Adrar",
     capacity: "46 000",
     risk: "Faible",
-    criminalite: 15,
-    pollution: 25,
-    infrastructure: 3,
+    criminalite: 39.12,
+    pollution: 75,
+    infrastructure: 3.4,
     description: "Station balnéaire moderne, Agadir offre un cadre idyllique avec ses plages et son climat ensoleillé.",
   },
   {
@@ -132,18 +132,79 @@ export default function CityPage() {
   const params = useParams()
   const [city, setCity] = useState<City | null>(null)
   const [userData, setUserData] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+
+  // Fonction pour charger les données de la ville depuis l'API
+  const loadCityData = useCallback(async () => {
+    if (!params.slug) return
+
+    setLoading(true)
+    try {
+      // Charger les données depuis l'API avec cache-busting pour éviter les données en cache
+      const response = await fetch(`http://localhost:8000/cities?t=${Date.now()}`)
+      if (response.ok) {
+        const data = await response.json()
+        const apiCity = data.cities?.find((c: any) => c.id === params.slug)
+        
+        if (apiCity) {
+          console.log("Données API reçues pour", params.slug, ":", {
+            Indice_Criminalite: apiCity.Indice_Criminalite,
+            Indice_Pollution: apiCity.Indice_Pollution,
+            Score_Infrastructures: apiCity.Score_Infrastructures,
+            NiveauGlobalRisque: apiCity.NiveauGlobalRisque
+          })
+          
+          // Trouver les données statiques pour les champs non fournis par l'API
+          const staticCity = moroccanCities.find((c) => c.slug === params.slug)
+          
+          // Mapper les données de l'API vers le format attendu
+          const mappedCity: City = {
+            name: apiCity.name || staticCity?.name || '',
+            slug: apiCity.id || params.slug as string,
+            image: staticCity?.image || `/image/${params.slug}.png`,
+            stadium: staticCity?.stadium || '',
+            capacity: staticCity?.capacity || '',
+            risk: (apiCity.NiveauGlobalRisque as "Faible" | "Moyen" | "Élevé") || staticCity?.risk || "Moyen",
+            criminalite: apiCity.Indice_Criminalite || staticCity?.criminalite || 50,
+            pollution: apiCity.Indice_Pollution || staticCity?.pollution || 50,
+            infrastructure: apiCity.Score_Infrastructures || staticCity?.infrastructure || 3,
+            description: staticCity?.description || ''
+          }
+          
+          console.log("Ville mappée:", mappedCity)
+          setCity(mappedCity)
+        } else {
+          console.warn("Ville non trouvée dans l'API, utilisation des données statiques")
+          // Fallback sur les données statiques si la ville n'est pas trouvée dans l'API
+          const foundCity = moroccanCities.find((c) => c.slug === params.slug)
+          setCity(foundCity || null)
+        }
+      } else {
+        console.error("Erreur API:", response.status, response.statusText)
+        // Fallback sur les données statiques en cas d'erreur API
+        const foundCity = moroccanCities.find((c) => c.slug === params.slug)
+        setCity(foundCity || null)
+      }
+    } catch (error) {
+      console.error("Erreur lors du chargement des données de la ville:", error)
+      // Fallback sur les données statiques en cas d'erreur
+      const foundCity = moroccanCities.find((c) => c.slug === params.slug)
+      setCity(foundCity || null)
+    } finally {
+      setLoading(false)
+    }
+  }, [params.slug])
 
   useEffect(() => {
-    // Trouver la ville
-    const foundCity = moroccanCities.find((c) => c.slug === params.slug)
-    setCity(foundCity || null)
+    // Charger les données de la ville depuis l'API
+    loadCityData()
 
     // Récupérer les données utilisateur depuis localStorage
     const user = localStorage.getItem("user")
     if (user) {
       setUserData(JSON.parse(user))
     }
-  }, [params.slug])
+  }, [loadCityData])
 
   const handleLogout = () => {
     localStorage.removeItem("authToken")
@@ -164,7 +225,7 @@ export default function CityPage() {
     }
   }
 
-  if (!city) {
+  if (loading || !city) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -249,7 +310,7 @@ export default function CityPage() {
                   <span className="font-semibold text-lg">Niveau de Risque: {city.risk}</span>
                 </div>
                 <div className="text-sm mt-1">
-                  {city.risk === "Faible" && "Zone sécurisée - Accès libre"}
+                  {city.risk === "Faible" && "Zone sécurisée "}
                   {city.risk === "Moyen" && "Vigilance recommandée - Précautions normales"}
                   {city.risk === "Élevé" && "Attention requise - Éviter si possible"}
                 </div>
@@ -297,7 +358,7 @@ export default function CityPage() {
             <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
             <TabsTrigger value="transport">Transport</TabsTrigger>
             <TabsTrigger value="info">Informations</TabsTrigger>
-            <TabsTrigger value="map">Carte & Signalements</TabsTrigger>
+            <TabsTrigger value="map">Carte</TabsTrigger>
             <TabsTrigger value="fan-experience">Fan Experience</TabsTrigger>
           </TabsList>
 
@@ -441,13 +502,6 @@ export default function CityPage() {
           </TabsContent>
         </Tabs>
 
-        <div className="mt-8">
-          <CommentSection
-            title={`Commentaires sur ${city.name}`}
-            placeholder={`Partagez vos expériences, conseils ou observations sur ${city.name}...`}
-            context="city"
-          />
-        </div>
       </div>
 
       {/* Chatbot */}

@@ -138,9 +138,7 @@ export default function MoroccoOverviewUnified() {
         {/* En-tête */}
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Vue d'ensemble du Maroc</h2>
-          <p className="text-gray-600 dark:text-gray-400 max-w-2xl">
-            Analyse globale de toutes les villes hôtes et coordination nationale pour la Coupe du Monde 2030
-          </p>
+
           
           {/* Indicateur de chargement et d'erreur */}
           {loading && (
@@ -216,7 +214,7 @@ export default function MoroccoOverviewUnified() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <MapPin className="h-5 w-5" />
-              Carte Interactive du Maroc - Villes Hôtes 2030
+              Carte Interactive du Maroc 
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -225,87 +223,7 @@ export default function MoroccoOverviewUnified() {
           </CardContent>
         </Card>
 
-        
-
-        {/* Analyses globales */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="h-5 w-5" />
-                Sécurité Nationale
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-green-600 mb-2">Bon</div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Niveau de sécurité global satisfaisant</p>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Villes à faible risque</span>
-                    <span className="font-bold">3/6</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>Villes à risque moyen</span>
-                    <span className="font-bold">3/6</span>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5" />
-                Infrastructure
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-blue-600 mb-2">
-                    {loading ? "..." : nationalStats?.averageInfrastructure || 3.5}/5
-                  </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Score moyen d'infrastructure</p>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-blue-600 h-2 rounded-full"
-                    style={{ width: `${((nationalStats?.averageInfrastructure || 3.5) / 5) * 100}%` }}
-                  ></div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5" />
-                Capacité d'Accueil
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-purple-600 mb-2">
-                    {loading ? "..." : nationalStats ? `${Math.round(nationalStats.totalCapacity / 1000)}K` : "410K"}
-                  </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Places totales disponibles</p>
-                </div>
-                <div className="text-sm text-center text-green-600 font-medium">
-                  ✓ Capacité suffisante pour l'événement
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-        </div>
-        |
-
+      </div>
       {/* Chatbot */}
       <Chatbot />
     </div>

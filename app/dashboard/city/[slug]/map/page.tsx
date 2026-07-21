@@ -21,6 +21,11 @@ import {
 import { ThemeToggle } from "@/components/theme-toggle"
 import Link from "next/link"
 import RabatMap from "@/components/rabat-map"
+import CasaMap from "@/components/casa-map"
+import FesMap from "@/components/fes-map"
+import TangerMap from "@/components/tanger-map"
+import MarrakechMap from "@/components/marrakech-map"
+import AgadirMap from "@/components/agadir-map"
 
 interface City {
   name: string
@@ -160,8 +165,8 @@ export default function MapPage() {
               <div className="flex items-center space-x-2">
                 <MapPin className="h-8 w-8 text-red-600" />
                 <div>
-                  <h1 className="text-xl font-bold text-gray-900 dark:text-white">Carte & Signalements - {city.name}</h1>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Zones de risque et signalements en temps réel</p>
+                  <h1 className="text-xl font-bold text-gray-900 dark:text-white">Carte  {city.name}</h1>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Zones de risque</p>
                 </div>
               </div>
             </div>
@@ -202,7 +207,7 @@ export default function MapPage() {
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Carte Interactive - {city.name}</h2>
           <p className="text-gray-600 dark:text-gray-400">
-            Visualisez les zones à risque, signalez des incidents et suivez la sécurité en temps réel
+            Visualisez les zones à risque
           </p>
         </div>
 
@@ -217,6 +222,16 @@ export default function MapPage() {
           <CardContent>
             {city.slug === "rabat" ? (
               <RabatMap />
+            ) : city.slug === "casablanca" ? (
+              <CasaMap />
+            ) : city.slug === "fes" ? (
+              <FesMap />
+            ) : city.slug === "tanger" ? (
+              <TangerMap />
+            ) : city.slug === "marrakech" ? (
+              <MarrakechMap />
+            ) : city.slug === "agadir" ? (
+              <AgadirMap />
             ) : (
               <div className="bg-gradient-to-br from-blue-100 via-yellow-50 to-orange-100 dark:from-blue-900 dark:via-yellow-900 dark:to-orange-900 rounded-lg h-96 flex items-center justify-center relative overflow-hidden">
                 {/* Carte SVG personnalisée pour les autres villes */}

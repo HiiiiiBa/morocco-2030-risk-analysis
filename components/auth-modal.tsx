@@ -208,7 +208,6 @@ export default function AuthModal({ isOpen, onClose, mode, onModeChange }: AuthM
           localStorage.removeItem("rememberMe")
         }
         
-        setSuccess("Connexion réussie ! Redirection...")
         
         // Redirection immédiate
         setTimeout(() => {
