@@ -1,5 +1,6 @@
 "use client"
 
+import { API_URL } from "@/lib/api"
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -97,7 +98,7 @@ export default function AuthModal({ isOpen, onClose, mode, onModeChange }: AuthM
 
   const handleForgotPassword = async () => {
     try {
-      const response = await fetch("http://localhost:8000/auth/forgot-password", {
+      const response = await fetch(`${API_URL}/auth/forgot-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -138,7 +139,7 @@ export default function AuthModal({ isOpen, onClose, mode, onModeChange }: AuthM
     }
 
     try {
-      const response = await fetch("http://localhost:8000/auth/reset-password", {
+      const response = await fetch(`${API_URL}/auth/reset-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -180,7 +181,7 @@ export default function AuthModal({ isOpen, onClose, mode, onModeChange }: AuthM
 
     console.log("📤 Payload envoyé:", payload)
 
-    const response = await fetch(`http://localhost:8000/auth/${endpoint}`, {
+    const response = await fetch(`${API_URL}/auth/${endpoint}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -220,7 +221,7 @@ export default function AuthModal({ isOpen, onClose, mode, onModeChange }: AuthM
         
         // Connexion automatique après inscription
         try {
-          const loginResponse = await fetch("http://localhost:8000/auth/login", {
+          const loginResponse = await fetch(`${API_URL}/auth/login`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json"

@@ -24,19 +24,28 @@ load_dotenv()
 
 app = FastAPI(title="Morocco 2030 Risk Analysis API")
 
-# Configuration CORS (plusieurs ports : Next.js peut basculer si 3000 est pris)
+# Configuration CORS
+_default_origins = [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://localhost:3002",
+    "http://localhost:3003",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:3001",
+    "http://127.0.0.1:3002",
+    "http://127.0.0.1:3003",
+]
+_frontend_url = os.getenv("FRONTEND_URL", "").strip()
+_extra_origins = [o.strip() for o in os.getenv("CORS_ORIGINS", "").split(",") if o.strip()]
+allow_origins = list(dict.fromkeys(
+    _default_origins
+    + ([_frontend_url] if _frontend_url else [])
+    + _extra_origins
+))
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://localhost:3001",
-        "http://localhost:3002",
-        "http://localhost:3003",
-        "http://127.0.0.1:3000",
-        "http://127.0.0.1:3001",
-        "http://127.0.0.1:3002",
-        "http://127.0.0.1:3003",
-    ],
+    allow_origins=allow_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -46,7 +55,8 @@ app.add_middleware(
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "AIzaSyBRNgO5qFgMG0qj6Da1phj3TJh2RV4TRxQ")
 GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
 
-# Configuration PostgreSQL
+# Configuration PostgreSQL (DATABASE_URL prioritaire, ex. Render/Railway)
+DATABASE_URL = os.getenv("DATABASE_URL")
 PG_DB = os.getenv("PG_DB", "Projet_stage")
 PG_USER = os.getenv("PG_USER", "postgres")
 PG_PASSWORD = os.getenv("PG_PASSWORD", "1314")
@@ -107,6 +117,8 @@ security = HTTPBearer()
 
 # Connexion PostgreSQL
 def get_db_connection():
+    if DATABASE_URL:
+        return psycopg2.connect(DATABASE_URL)
     return psycopg2.connect(
         dbname=PG_DB,
         user=PG_USER,
@@ -215,7 +227,10 @@ def init_database():
     conn.close()
 
 # Initialiser la base de données au démarrage
-init_database()
+try:
+    init_database()
+except Exception as e:
+    print(f"⚠️ Init DB reportée (réessayez au premier appel): {e}")
 
 class ChatbotSystem:
     def __init__(self):
@@ -224,16 +239,22 @@ class ChatbotSystem:
         self.load_faq()
     
     def load_faq(self):
-        conn = get_db_connection()
-        cur = conn.cursor()
-        cur.execute("SELECT question, reponse FROM faq")
-        data = cur.fetchall()
-        self.questions = [row[0] for row in data]
-        self.answers = [row[1] for row in data]
-        if self.questions:
-            self.question_vectors = self.vectorizer.fit_transform(self.questions)
-        cur.close()
-        conn.close()
+        try:
+            conn = get_db_connection()
+            cur = conn.cursor()
+            cur.execute("SELECT question, reponse FROM faq")
+            data = cur.fetchall()
+            self.questions = [row[0] for row in data]
+            self.answers = [row[1] for row in data]
+            if self.questions:
+                self.question_vectors = self.vectorizer.fit_transform(self.questions)
+            cur.close()
+            conn.close()
+        except Exception as e:
+            print(f"⚠️ Impossible de charger la FAQ: {e}")
+            self.questions = []
+            self.answers = []
+            self.question_vectors = None
     
     def find_local_answer(self, user_question: str):
         with self.lock:
@@ -313,23 +334,6 @@ class ChatbotSystem:
             return f"Erreur inattendue: {str(e)}"
 
 chatbot = ChatbotSystem()
-
-import pandas as pd
-import numpy as np
-from sklearn.preprocessing import LabelEncoder
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.linear_model import SGDClassifier
-import psycopg2
-
-# Fonction de connexion à la DB
-def get_db_connection():
-    return psycopg2.connect(
-        dbname="Projet_stage",
-        user="postgres",
-        password="1314",
-        host="localhost",
-        port="5432"
-    )
 
 import pandas as pd
 import numpy as np
@@ -450,16 +454,6 @@ class RiskAnalysisSystem:
                     "Score_Infrastructures": row["Score_Infrastructures"]
                 }
             return None
-
-# --- Fonction de connexion DB ---
-def get_db_connection():
-    return psycopg2.connect(
-        dbname="Projet_stage",
-        user="postgres",
-        password="1314",
-        host="localhost",
-        port="5432"
-    )
 
 # --- Instanciation globale pour FastAPI ---
 risk_system = RiskAnalysisSystem(csv_path="dataset.csv")
@@ -1026,4 +1020,5 @@ async def get_weather(city_id: str):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    port = int(os.getenv("PORT", "8000"))
+    uvicorn.run(app, host="0.0.0.0", port=port)

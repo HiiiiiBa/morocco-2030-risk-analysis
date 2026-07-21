@@ -1,5 +1,6 @@
 "use client"
 
+import { API_URL } from "@/lib/api"
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
@@ -25,7 +26,7 @@ export default function HomePage() {
       if (token) {
         try {
           // Vérifier si le token est valide
-          const response = await fetch("http://localhost:8000/user", {
+          const response = await fetch(`${API_URL}/user`, {
             headers: {
               'Authorization': `Bearer ${token}`
             }

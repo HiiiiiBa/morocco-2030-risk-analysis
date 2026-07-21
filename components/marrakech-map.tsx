@@ -1,5 +1,6 @@
 "use client"
 
+import { API_URL } from "@/lib/api"
 import { useEffect, useState, useRef, useCallback } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -180,7 +181,7 @@ export default function MarrakechMap() {
   // Fonction pour charger les commentaires depuis l'API
   const loadZoneComments = async (zoneId: string) => {
     try {
-      const response = await fetch(`http://localhost:8000/cities/marrakech/districts/${zoneId}/comments`)
+      const response = await fetch(`${API_URL}/cities/marrakech/districts/${zoneId}/comments`)
       if (response.ok) {
         const data = await response.json()
         const comments = data.comments || []
@@ -230,7 +231,7 @@ export default function MarrakechMap() {
         commentaire: newComment
       }
 
-      const response = await fetch(`http://localhost:8000/cities/marrakech/districts/${selectedZone.id}/comments`, {
+      const response = await fetch(`${API_URL}/cities/marrakech/districts/${selectedZone.id}/comments`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -1,5 +1,6 @@
 "use client"
 
+import { API_URL } from "@/lib/api"
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -43,7 +44,7 @@ export default function CommentSection({
     
     setLoading(true)
     try {
-      const response = await fetch(`http://localhost:8000/cities/${cityId}/comments`)
+      const response = await fetch(`${API_URL}/cities/${cityId}/comments`)
       if (response.ok) {
         const data = await response.json()
         setComments(data.comments || [])
@@ -86,7 +87,7 @@ export default function CommentSection({
         commentaire: newComment
       }
 
-      const response = await fetch(`http://localhost:8000/cities/${cityId}/comments`, {
+      const response = await fetch(`${API_URL}/cities/${cityId}/comments`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

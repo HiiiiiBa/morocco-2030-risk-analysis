@@ -1,5 +1,6 @@
 "use client"
 
+import { API_URL } from "@/lib/api"
 import { useState, useEffect, useRef, useMemo, useCallback } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -866,7 +867,7 @@ const loadCityComments = async (cityId: string) => {
   
   setLoadingComments(true)
   try {
-    const response = await fetch(`http://localhost:8000/cities/${cityId}/comments`)
+    const response = await fetch(`${API_URL}/cities/${cityId}/comments`)
     if (response.ok) {
       const data = await response.json()
       const comments = data.comments || []
@@ -918,7 +919,7 @@ const loadCityComments = async (cityId: string) => {
         commentaire: newComment
       }
 
-      const response = await fetch(`http://localhost:8000/cities/${selectedCity.id}/comments`, {
+      const response = await fetch(`${API_URL}/cities/${selectedCity.id}/comments`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

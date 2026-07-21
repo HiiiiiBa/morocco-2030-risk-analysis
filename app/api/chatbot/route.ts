@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Appel au backend Python
-    const backendUrl = process.env.BACKEND_URL || 'http://localhost:8000'
+    const backendUrl = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
     
     const response = await fetch(`${backendUrl}/chat`, {
       method: 'POST',

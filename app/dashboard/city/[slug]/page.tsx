@@ -1,5 +1,6 @@
 "use client"
 
+import { API_URL } from "@/lib/api"
 import { useState, useEffect, useCallback } from "react"
 import { useParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -141,7 +142,7 @@ export default function CityPage() {
     setLoading(true)
     try {
       // Charger les données depuis l'API avec cache-busting pour éviter les données en cache
-      const response = await fetch(`http://localhost:8000/cities?t=${Date.now()}`)
+      const response = await fetch(`${API_URL}/cities?t=${Date.now()}`)
       if (response.ok) {
         const data = await response.json()
         const apiCity = data.cities?.find((c: any) => c.id === params.slug)
