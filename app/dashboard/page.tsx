@@ -9,7 +9,6 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import Link from "next/link"
 import CommentSection from "@/components/comment-section"
 import Chatbot from "@/components/chatbot"
-import MoroccoMap from "@/components/morocco-map"
 
 interface City {
   name: string

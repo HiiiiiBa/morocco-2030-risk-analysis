@@ -1,0 +1,14 @@
+{
+  "services": {
+    "frontend": {
+      "framework": "nextjs",
+      "root": "."
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": { "service": "frontend" }
+    }
+  ]
+}
