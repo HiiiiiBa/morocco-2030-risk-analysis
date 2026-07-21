@@ -43,7 +43,7 @@ app.add_middleware(
 )
 
 # Configuration
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "AIzaSyBRNgO5qFgMG0qj6Da1phj3TJh2RV4TRxQ")
 GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
 
 # Configuration PostgreSQL
@@ -252,12 +252,6 @@ class ChatbotSystem:
                 return None
     
     def call_gemini_api(self, question: str) -> str:
-        if not GEMINI_API_KEY:
-            return (
-                "Clé Gemini manquante. Ajoutez GEMINI_API_KEY dans backend/.env "
-                "(https://aistudio.google.com/apikey)."
-            )
-
         headers = {
             "Content-Type": "application/json"
         }
